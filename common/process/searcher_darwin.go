@@ -24,11 +24,11 @@ func NewSearcher(_ Config) (Searcher, error) {
 }
 
 func (d *darwinSearcher) FindProcessInfo(ctx context.Context, network string, source netip.AddrPort, destination netip.AddrPort) (*Info, error) {
-	processName, err := findProcessName(network, source.Addr(), int(source.Port()))
+	processInfo, err := findProcessName(network, source.Addr(), int(source.Port()))
 	if err != nil {
 		return nil, err
 	}
-	return &Info{ProcessPath: processName, UserId: -1}, nil
+	return &Info{ProcessPath: processInfo.Name, PID: processInfo.PID, UserId: -1}, nil
 }
 
 var structSize = func() int {
@@ -47,7 +47,7 @@ var structSize = func() int {
 	}
 }()
 
-func findProcessName(network string, ip netip.Addr, port int) (string, error) {
+func findProcessName(network string, ip netip.Addr, port int) (*processInfo, error) {
 	var spath string
 	switch network {
 	case N.NetworkTCP:
@@ -55,14 +55,14 @@ func findProcessName(network string, ip netip.Addr, port int) (string, error) {
 	case N.NetworkUDP:
 		spath = "net.inet.udp.pcblist_n"
 	default:
-		return "", os.ErrInvalid
+		return nil, os.ErrInvalid
 	}
 
 	isIPv4 := ip.Is4()
 
 	value, err := syscall.Sysctl(spath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	buf := []byte(value)
@@ -107,10 +107,18 @@ func findProcessName(network string, ip netip.Addr, port int) (string, error) {
 
 		// xsocket_n.so_last_pid
 		pid := readNativeUint32(buf[so+68 : so+72])
-		return getExecPathFromPID(pid)
+		path, err := getExecPathFromPID(pid)
+		if err != nil {
+			return nil, err
+		}
+
+		return &processInfo{
+			Name: path,
+			PID:  pid,
+		}, nil
 	}
 
-	return "", ErrNotFound
+	return nil, ErrNotFound
 }
 
 func getExecPathFromPID(pid uint32) (string, error) {

@@ -681,6 +681,9 @@ func (r *Router) match(ctx context.Context, metadata *adapter.InboundContext, de
 		} else {
 			if processInfo.ProcessPath != "" {
 				r.logger.InfoContext(ctx, "found process path: ", processInfo.ProcessPath)
+				if processInfo.PID != 0 {
+					r.logger.InfoContext(ctx, "found process PID: ", processInfo.PID)
+				}
 			} else if processInfo.PackageName != "" {
 				r.logger.InfoContext(ctx, "found package name: ", processInfo.PackageName)
 			} else if processInfo.UserId != -1 {

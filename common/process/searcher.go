@@ -25,6 +25,12 @@ type Info struct {
 	PackageName string
 	User        string
 	UserId      int32
+	PID         uint32
+}
+
+type processInfo struct {
+	Name string
+	PID  uint32
 }
 
 func FindProcessInfo(searcher Searcher, ctx context.Context, network string, source netip.AddrPort, destination netip.AddrPort) (*Info, error) {
