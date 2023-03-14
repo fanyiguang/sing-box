@@ -31,6 +31,7 @@ require (
 	github.com/sagernet/smux v0.0.0-20220831015742-e0f1988e3195
 	github.com/sagernet/websocket v0.0.0-20220913015213-615516348b4e
 	github.com/sagernet/wireguard-go v0.0.0-20221116151939-c99467f53f2c
+	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	go.etcd.io/bbolt v1.3.7
@@ -53,6 +54,7 @@ require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/cloudflare/circl v1.2.1-0.20221019164342-6ab4dfed8f3c // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -72,7 +74,10 @@ require (
 	github.com/sagernet/go-tun2socks v1.16.12-0.20220818015926-16cb67876a61 // indirect
 	github.com/sagernet/netlink v0.0.0-20220905062125-8043b4a9aa97 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/tklauser/go-sysconf v0.3.11 // indirect
+	github.com/tklauser/numcpus v0.6.0 // indirect
 	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect
+	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
