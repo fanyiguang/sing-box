@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"context"
+	"github.com/sagernet/sing-box/log"
 	"net"
 	"net/netip"
 
@@ -19,6 +20,7 @@ type Router interface {
 
 	Outbounds() []Outbound
 	Outbound(tag string) (Outbound, bool)
+	AddOutbounds(outbounds []Outbound, replace bool) error
 	DefaultOutbound(network string) Outbound
 
 	RouteConnection(ctx context.Context, conn net.Conn, metadata InboundContext) error
@@ -39,12 +41,15 @@ type Router interface {
 	InterfaceMonitor() tun.DefaultInterfaceMonitor
 	PackageManager() tun.PackageManager
 	Rules() []Rule
+	AddRules([]Rule)
 
 	ClashServer() ClashServer
 	SetClashServer(server ClashServer)
 
 	V2RayServer() V2RayServer
 	SetV2RayServer(server V2RayServer)
+
+	Logger() log.ContextLogger
 }
 
 type Rule interface {

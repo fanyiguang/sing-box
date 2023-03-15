@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"context"
+	"github.com/sagernet/sing-box/option"
 	"net"
 
 	"github.com/sagernet/sing-box/common/urltest"
@@ -47,4 +48,12 @@ type V2RayServer interface {
 type V2RayStatsService interface {
 	RoutedConnection(inbound string, outbound string, conn net.Conn) net.Conn
 	RoutedPacketConnection(inbound string, outbound string, conn N.PacketConn) N.PacketConn
+}
+
+type Controller interface {
+	Service
+	AddProxies([]option.Outbound, bool) error
+	StartURLTest(string, int) error
+	AddRules([]option.Rule) error
+	ClearRules()
 }

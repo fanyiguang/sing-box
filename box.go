@@ -32,6 +32,7 @@ type Box struct {
 	logFile     *os.File
 	clashServer adapter.ClashServer
 	v2rayServer adapter.V2RayServer
+	controller  adapter.Controller
 	done        chan struct{}
 }
 
@@ -41,12 +42,16 @@ func New(ctx context.Context, options option.Options) (*Box, error) {
 
 	var needClashAPI bool
 	var needV2RayAPI bool
+	var needController bool
 	if options.Experimental != nil {
 		if options.Experimental.ClashAPI != nil && options.Experimental.ClashAPI.ExternalController != "" {
 			needClashAPI = true
 		}
 		if options.Experimental.V2RayAPI != nil && options.Experimental.V2RayAPI.Listen != "" {
 			needV2RayAPI = true
+		}
+		if options.Experimental.Controller != nil {
+			needController = true
 		}
 	}
 
@@ -78,7 +83,7 @@ func New(ctx context.Context, options option.Options) (*Box, error) {
 			FullTimestamp:    logOptions.Timestamp,
 			TimestampFormat:  "-0700 2006-01-02 15:04:05",
 		}
-		if needClashAPI {
+		if needClashAPI || needController {
 			observableLogFactory = log.NewObservableFactory(logFormatter, logWriter)
 			logFactory = observableLogFactory
 		} else {
@@ -156,6 +161,7 @@ func New(ctx context.Context, options option.Options) (*Box, error) {
 
 	var clashServer adapter.ClashServer
 	var v2rayServer adapter.V2RayServer
+	var controller adapter.Controller
 	if needClashAPI {
 		clashServer, err = experimental.NewClashServer(router, observableLogFactory, common.PtrValueOrDefault(options.Experimental.ClashAPI))
 		if err != nil {
@@ -169,6 +175,13 @@ func New(ctx context.Context, options option.Options) (*Box, error) {
 			return nil, E.Cause(err, "create v2ray api server")
 		}
 		router.SetV2RayServer(v2rayServer)
+	}
+	if needController {
+		controller, err = experimental.NewController(ctx, router, observableLogFactory, common.PtrValueOrDefault(options.Experimental.Controller))
+		if err != nil {
+			return nil, E.Cause(err, "create controller")
+		}
+		router.SetController(controller)
 	}
 	return &Box{
 		router:      router,
@@ -272,4 +285,8 @@ func (s *Box) Close() error {
 
 func (s *Box) Router() adapter.Router {
 	return s.router
+}
+
+func (s *Box) Controller() adapter.Controller {
+	return s.controller
 }

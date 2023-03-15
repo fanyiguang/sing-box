@@ -2,6 +2,7 @@ package route
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -67,8 +69,10 @@ type Router struct {
 	logger                             log.ContextLogger
 	dnsLogger                          log.ContextLogger
 	inboundByTag                       map[string]adapter.Inbound
+	outboundsLock                      sync.RWMutex
 	outbounds                          []adapter.Outbound
 	outboundByTag                      map[string]adapter.Outbound
+	rulesLock                          sync.RWMutex
 	rules                              []adapter.Rule
 	defaultDetour                      string
 	defaultOutboundForConnection       adapter.Outbound
@@ -97,6 +101,7 @@ type Router struct {
 	processSearcher                    process.Searcher
 	clashServer                        adapter.ClashServer
 	v2rayServer                        adapter.V2RayServer
+	controller                         adapter.Controller
 }
 
 func NewRouter(ctx context.Context, logFactory log.Factory, options option.RouteOptions, dnsOptions option.DNSOptions, inbounds []option.Inbound) (*Router, error) {
@@ -488,8 +493,25 @@ func (r *Router) LoadGeosite(code string) (adapter.Rule, error) {
 }
 
 func (r *Router) Outbound(tag string) (adapter.Outbound, bool) {
+	r.outboundsLock.RLock()
+	defer r.outboundsLock.RUnlock()
 	outbound, loaded := r.outboundByTag[tag]
 	return outbound, loaded
+}
+
+func (r *Router) AddOutbounds(outbounds []adapter.Outbound, replace bool) error {
+	err := r.createOutbounds(outbounds, replace)
+	if err != nil {
+		return err
+	}
+
+	for _, out := range outbounds {
+		err := common.Start(out)
+		if err != nil {
+			r.logger.Error("start outbound error:", err)
+		}
+	}
+	return nil
 }
 
 func (r *Router) DefaultOutbound(network string) adapter.Outbound {
@@ -732,7 +754,15 @@ func (r *Router) DefaultMark() int {
 }
 
 func (r *Router) Rules() []adapter.Rule {
+	r.rulesLock.RLock()
+	defer r.rulesLock.RUnlock()
 	return r.rules
+}
+
+func (r *Router) AddRules(rule []adapter.Rule) {
+	r.rulesLock.Lock()
+	defer r.rulesLock.Unlock()
+	r.rules = append(r.rules, rule...)
 }
 
 func (r *Router) NetworkMonitor() tun.NetworkUpdateMonitor {
@@ -761,6 +791,14 @@ func (r *Router) V2RayServer() adapter.V2RayServer {
 
 func (r *Router) SetV2RayServer(server adapter.V2RayServer) {
 	r.v2rayServer = server
+}
+
+func (r *Router) Controller() adapter.Controller {
+	return r.controller
+}
+
+func (r *Router) SetController(controller adapter.Controller) {
+	r.controller = controller
 }
 
 func hasRule(rules []option.Rule, cond func(rule option.DefaultRule) bool) bool {
@@ -1028,4 +1066,38 @@ func (r *Router) notifyNetworkUpdate(int) error {
 		}
 	}
 	return nil
+}
+
+func (r *Router) createOutbounds(outbounds []adapter.Outbound, replace bool) error {
+	r.outboundsLock.Lock()
+	defer r.outboundsLock.Unlock()
+
+	if !replace {
+		for _, out := range outbounds {
+			if _, ok := r.outboundByTag[out.Tag()]; ok {
+				return fmt.Errorf("outbound %q allready exists", out.Tag())
+			}
+		}
+	}
+
+	// clean r.outbounds
+	r.outbounds = common.Filter(r.outbounds, func(it adapter.Outbound) bool {
+		for _, outbound := range outbounds {
+			if it.Tag() == outbound.Tag() {
+				common.Close(it)
+				return true
+			}
+		}
+		return false
+	})
+
+	for _, out := range outbounds {
+		r.outbounds = append(r.outbounds, out)
+		r.outboundByTag[out.Tag()] = out
+	}
+	return nil
+}
+
+func (r *Router) Logger() log.ContextLogger {
+	return r.logger
 }
