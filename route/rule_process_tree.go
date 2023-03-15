@@ -23,13 +23,20 @@ var _ RuleItem = (*ProcessTreeItem)(nil)
 
 type ProcessTreeItem struct {
 	processIds  []int32
+	processes   []*goproc.Process
 	childrenMap sync.Map // pid:*process.Process
 }
 
-func NewProcessPidTreeItem(processIds []int32) *ProcessTreeItem {
+func NewProcessTreeItem(processIds []int32) *ProcessTreeItem {
 	warnProcessTreeOnNonSupportedPlatform.Check()
 	rule := &ProcessTreeItem{
 		processIds: processIds,
+	}
+	for _, pid := range processIds {
+		proc, err := goproc.NewProcess(pid)
+		if err == nil {
+			rule.processes = append(rule.processes, proc)
+		}
 	}
 	return rule
 }
@@ -55,9 +62,12 @@ func (r *ProcessTreeItem) Match(metadata *adapter.InboundContext) bool {
 
 	ppids := metadata.ProcessParentIds
 
-	for _, tPid := range r.processIds {
+	for _, process := range r.processes {
+		if running, _ := process.IsRunning(); !running {
+			continue
+		}
 		find := common.Find(ppids, func(pid int32) bool {
-			if tPid == pid {
+			if process.Pid == pid {
 				return true
 			}
 			return false

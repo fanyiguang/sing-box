@@ -98,6 +98,7 @@ type DefaultRule struct {
 	PortRange       Listable[string] `json:"port_range,omitempty"`
 	ProcessName     Listable[string] `json:"process_name,omitempty"`
 	ProcessPath     Listable[string] `json:"process_path,omitempty"`
+	ProcessTree     Listable[int32]  `json:"process_tree,omitempty"`
 	PackageName     Listable[string] `json:"package_name,omitempty"`
 	User            Listable[string] `json:"user,omitempty"`
 	UserID          Listable[int32]  `json:"user_id,omitempty"`
