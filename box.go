@@ -3,6 +3,7 @@ package box
 import (
 	"context"
 	"fmt"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
 	"runtime/debug"
@@ -69,12 +70,23 @@ func New(ctx context.Context, options option.Options) (*Box, error) {
 		case "stdout":
 			logWriter = os.Stdout
 		default:
-			var err error
-			logFile, err = os.OpenFile(logOptions.Output, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-			if err != nil {
-				return nil, err
+			if !logOptions.Rotate.Disabled {
+				var err error
+				logFile, err = os.OpenFile(logOptions.Output, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+				if err != nil {
+					return nil, err
+				}
+				logWriter = logFile
+			} else {
+				logger := &lumberjack.Logger{
+					LocalTime:  true,
+					Filename:   logOptions.Output,
+					MaxSize:    logOptions.Rotate.MaxSize,
+					MaxBackups: logOptions.Rotate.MaxBackups,
+					MaxAge:     logOptions.Rotate.MaxAge,
+				}
+				logWriter = logger
 			}
-			logWriter = logFile
 		}
 		logFormatter := log.Formatter{
 			BaseTime:         createdAt,
