@@ -765,6 +765,22 @@ func (r *Router) AddRules(rule []adapter.Rule) {
 	r.rules = append(r.rules, rule...)
 }
 
+func (r *Router) DelRules(tag string) {
+	if len(tag) == 0 {
+		return
+	}
+
+	r.rulesLock.Lock()
+	defer r.rulesLock.Unlock()
+again:
+	for i, rule := range r.rules {
+		if tag == rule.Tag() {
+			r.rules = append(r.rules[:i], r.rules[i+1:]...)
+			goto again
+		}
+	}
+}
+
 func (r *Router) NetworkMonitor() tun.NetworkUpdateMonitor {
 	return r.networkMonitor
 }

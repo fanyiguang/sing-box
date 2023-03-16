@@ -55,5 +55,6 @@ type Controller interface {
 	AddProxies([]option.Outbound, bool) error
 	StartURLTest(string, int) error
 	AddRules([]option.Rule) error
+	DelRule(tag string)
 	ClearRules()
 }

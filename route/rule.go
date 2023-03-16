@@ -47,6 +47,7 @@ type DefaultRule struct {
 	allItems                []RuleItem
 	invert                  bool
 	outbound                string
+	tag                     string
 }
 
 type RuleItem interface {
@@ -58,6 +59,7 @@ func NewDefaultRule(router adapter.Router, logger log.ContextLogger, options opt
 	rule := &DefaultRule{
 		invert:   options.Invert,
 		outbound: options.Outbound,
+		tag:      options.Tag,
 	}
 	if len(options.Inbound) > 0 {
 		item := NewInboundRule(options.Inbound)
@@ -211,6 +213,10 @@ func (r *DefaultRule) Type() string {
 	return C.RuleTypeDefault
 }
 
+func (r *DefaultRule) Tag() string {
+	return r.tag
+}
+
 func (r *DefaultRule) Start() error {
 	for _, item := range r.allItems {
 		err := common.Start(item)
@@ -324,6 +330,7 @@ type LogicalRule struct {
 	rules    []*DefaultRule
 	invert   bool
 	outbound string
+	tag      string
 }
 
 func NewLogicalRule(router adapter.Router, logger log.ContextLogger, options option.LogicalRule) (*LogicalRule, error) {
@@ -331,6 +338,7 @@ func NewLogicalRule(router adapter.Router, logger log.ContextLogger, options opt
 		rules:    make([]*DefaultRule, len(options.Rules)),
 		invert:   options.Invert,
 		outbound: options.Outbound,
+		tag:      options.Tag,
 	}
 	switch options.Mode {
 	case C.LogicalTypeAnd:
@@ -352,6 +360,10 @@ func NewLogicalRule(router adapter.Router, logger log.ContextLogger, options opt
 
 func (r *LogicalRule) Type() string {
 	return C.RuleTypeLogical
+}
+
+func (r *LogicalRule) Tag() string {
+	return r.tag
 }
 
 func (r *LogicalRule) UpdateGeosite() error {

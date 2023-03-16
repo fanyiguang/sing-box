@@ -42,6 +42,7 @@ type Router interface {
 	PackageManager() tun.PackageManager
 	Rules() []Rule
 	AddRules([]Rule)
+	DelRules(tag string)
 
 	ClashServer() ClashServer
 	SetClashServer(server ClashServer)
@@ -55,6 +56,7 @@ type Router interface {
 type Rule interface {
 	Service
 	Type() string
+	Tag() string
 	UpdateGeosite() error
 	Match(metadata *InboundContext) bool
 	Outbound() string
