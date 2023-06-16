@@ -19,6 +19,8 @@ type Router interface {
 
 	Outbounds() []Outbound
 	Outbound(tag string) (Outbound, bool)
+	DelOutbound(tag string)
+	AddOutbounds(outbounds []Outbound, replace bool) error
 	DefaultOutbound(network string) Outbound
 
 	RouteConnection(ctx context.Context, conn net.Conn, metadata InboundContext) error
@@ -41,6 +43,9 @@ type Router interface {
 	InterfaceMonitor() tun.DefaultInterfaceMonitor
 	PackageManager() tun.PackageManager
 	Rules() []Rule
+	AddRules([]Rule)
+	DelRules(tag string)
+	UpdateRule(tag string, rule Rule)
 
 	TimeService
 
@@ -68,6 +73,7 @@ func RouterFromContext(ctx context.Context) Router {
 type Rule interface {
 	Service
 	Type() string
+	Tag() string
 	UpdateGeosite() error
 	Match(metadata *InboundContext) bool
 	Outbound() string

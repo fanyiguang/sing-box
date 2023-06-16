@@ -2,6 +2,7 @@ package route
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -51,7 +53,9 @@ type Router struct {
 	inboundByTag                       map[string]adapter.Inbound
 	outbounds                          []adapter.Outbound
 	outboundByTag                      map[string]adapter.Outbound
+	outboundMt                         sync.RWMutex
 	rules                              []adapter.Rule
+	ruleMt                             sync.RWMutex
 	defaultDetour                      string
 	defaultOutboundForConnection       adapter.Outbound
 	defaultOutboundForPacketConnection adapter.Outbound
@@ -80,6 +84,7 @@ type Router struct {
 	timeService                        adapter.TimeService
 	clashServer                        adapter.ClashServer
 	v2rayServer                        adapter.V2RayServer
+	controller                         adapter.Controller
 	platformInterface                  platform.Interface
 }
 
@@ -375,7 +380,7 @@ func (r *Router) Initialize(inbounds []adapter.Inbound, outbounds []adapter.Outb
 	r.defaultOutboundForConnection = defaultOutboundForConnection
 	r.defaultOutboundForPacketConnection = defaultOutboundForPacketConnection
 	r.outboundByTag = outboundByTag
-	for i, rule := range r.rules {
+	for i, rule := range r.Rules() {
 		if _, loaded := outboundByTag[rule.Outbound()]; !loaded {
 			return E.New("outbound not found for rule[", i, "]: ", rule.Outbound())
 		}
@@ -419,7 +424,7 @@ func (r *Router) Start() error {
 		}
 	}
 	if r.needGeositeDatabase {
-		for _, rule := range r.rules {
+		for _, rule := range r.Rules() {
 			err := rule.UpdateGeosite()
 			if err != nil {
 				r.logger.Error("failed to initialize geosite: ", err)
@@ -438,7 +443,7 @@ func (r *Router) Start() error {
 		r.geositeCache = nil
 		r.geositeReader = nil
 	}
-	for i, rule := range r.rules {
+	for i, rule := range r.Rules() {
 		err := rule.Start()
 		if err != nil {
 			return E.Cause(err, "initialize rule[", i, "]")
@@ -467,7 +472,7 @@ func (r *Router) Start() error {
 
 func (r *Router) Close() error {
 	var err error
-	for i, rule := range r.rules {
+	for i, rule := range r.Rules() {
 		r.logger.Trace("closing rule[", i, "]")
 		err = E.Append(err, rule.Close(), func(err error) error {
 			return E.Cause(err, "close rule[", i, "]")
@@ -540,8 +545,76 @@ func (r *Router) LoadGeosite(code string) (adapter.Rule, error) {
 }
 
 func (r *Router) Outbound(tag string) (adapter.Outbound, bool) {
+	r.outboundMt.Lock()
+	defer r.outboundMt.Unlock()
 	outbound, loaded := r.outboundByTag[tag]
 	return outbound, loaded
+}
+
+func (r *Router) DelOutbound(tag string) {
+	if len(tag) == 0 {
+		return
+	}
+
+	r.outboundMt.Lock()
+	defer r.outboundMt.Unlock()
+	for _tag, out := range r.outboundByTag {
+		if _tag == tag {
+			delete(r.outboundByTag, tag)
+			_ = common.Close(out)
+			r.outbounds = common.Filter(r.outbounds, func(r adapter.Outbound) bool {
+				if r.Tag() == tag {
+					return false
+				}
+				return true
+			})
+			break
+		}
+	}
+}
+
+func (r *Router) AddOutbounds(outbounds []adapter.Outbound, replace bool) error {
+	err := r.addOutbounds(outbounds, replace)
+	if err != nil {
+		return err
+	}
+
+	for _, out := range outbounds {
+		err := common.Start(out)
+		if err != nil {
+			r.logger.Error("start outbound error:", err)
+		}
+	}
+	return nil
+}
+
+func (r *Router) addOutbounds(outbounds []adapter.Outbound, replace bool) error {
+	r.outboundMt.Lock()
+	defer r.outboundMt.Unlock()
+	if !replace {
+		for _, out := range outbounds {
+			if _, ok := r.outboundByTag[out.Tag()]; ok {
+				return fmt.Errorf("outbound %q allready exists", out.Tag())
+			}
+		}
+	}
+
+	// clean r.outbounds
+	r.outbounds = common.Filter(r.outbounds, func(it adapter.Outbound) bool {
+		for _, outbound := range outbounds {
+			if it.Tag() == outbound.Tag() {
+				common.Close(it)
+				return false
+			}
+		}
+		return true
+	})
+
+	for _, out := range outbounds {
+		r.outbounds = append(r.outbounds, out)
+		r.outboundByTag[out.Tag()] = out
+	}
+	return nil
 }
 
 func (r *Router) DefaultOutbound(network string) adapter.Outbound {
@@ -782,7 +855,7 @@ func (r *Router) match0(ctx context.Context, metadata *adapter.InboundContext, d
 			metadata.ProcessInfo = processInfo
 		}
 	}
-	for i, rule := range r.rules {
+	for i, rule := range r.Rules() {
 		if rule.Match(metadata) {
 			detour := rule.Outbound()
 			r.logger.DebugContext(ctx, "match[", i, "] ", rule.String(), " => ", detour)
@@ -846,7 +919,42 @@ func (r *Router) DefaultMark() int {
 }
 
 func (r *Router) Rules() []adapter.Rule {
+	r.ruleMt.RLock()
+	defer r.ruleMt.RUnlock()
 	return r.rules
+}
+
+func (r *Router) AddRules(rule []adapter.Rule) {
+	r.ruleMt.Lock()
+	defer r.ruleMt.Unlock()
+	r.rules = append(r.rules, rule...)
+}
+
+func (r *Router) UpdateRule(tag string, rule adapter.Rule) {
+	r.ruleMt.Lock()
+	defer r.ruleMt.Unlock()
+	r.rules = common.Filter(r.rules, func(r adapter.Rule) bool {
+		if r.Tag() == tag {
+			return false
+		}
+		return true
+	})
+	r.rules = append(r.rules, rule)
+}
+
+func (r *Router) DelRules(tag string) {
+	if len(tag) == 0 {
+		return
+	}
+
+	r.ruleMt.Lock()
+	defer r.ruleMt.Unlock()
+	r.rules = common.Filter(r.rules, func(r adapter.Rule) bool {
+		if r.Tag() == tag {
+			return false
+		}
+		return true
+	})
 }
 
 func (r *Router) NetworkMonitor() tun.NetworkUpdateMonitor {
@@ -882,6 +990,14 @@ func (r *Router) V2RayServer() adapter.V2RayServer {
 
 func (r *Router) SetV2RayServer(server adapter.V2RayServer) {
 	r.v2rayServer = server
+}
+
+func (r *Router) Controller() adapter.Controller {
+	return r.controller
+}
+
+func (r *Router) SetController(controller adapter.Controller) {
+	r.controller = controller
 }
 
 func hasRule(rules []option.Rule, cond func(rule option.DefaultRule) bool) bool {

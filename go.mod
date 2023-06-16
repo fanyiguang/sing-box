@@ -48,6 +48,7 @@ require (
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gvisor.dev/gvisor v0.0.0-20220901235040-6ca97ef2ce1c
 )
 
@@ -78,6 +79,7 @@ require (
 	github.com/quic-go/qtls-go1-20 v0.1.0 // indirect
 	github.com/sagernet/go-tun2socks v1.16.12-0.20220818015926-16cb67876a61 // indirect
 	github.com/sagernet/netlink v0.0.0-20220905062125-8043b4a9aa97 // indirect
+	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/u-root/uio v0.0.0-20230220225925-ffce2a382923 // indirect
 	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect

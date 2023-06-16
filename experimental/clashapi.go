@@ -8,7 +8,7 @@ import (
 	"github.com/sagernet/sing-box/option"
 )
 
-type ClashServerConstructor = func(router adapter.Router, logFactory log.ObservableFactory, options option.ClashAPIOptions) (adapter.ClashServer, error)
+type ClashServerConstructor = func(router adapter.Router, inbound []adapter.Inbound, logFactory log.ObservableFactory, options option.ClashAPIOptions) (adapter.ClashServer, error)
 
 var clashServerConstructor ClashServerConstructor
 
@@ -16,9 +16,9 @@ func RegisterClashServerConstructor(constructor ClashServerConstructor) {
 	clashServerConstructor = constructor
 }
 
-func NewClashServer(router adapter.Router, logFactory log.ObservableFactory, options option.ClashAPIOptions) (adapter.ClashServer, error) {
+func NewClashServer(router adapter.Router, inbounds []adapter.Inbound, logFactory log.ObservableFactory, options option.ClashAPIOptions) (adapter.ClashServer, error) {
 	if clashServerConstructor == nil {
 		return nil, os.ErrInvalid
 	}
-	return clashServerConstructor(router, logFactory, options)
+	return clashServerConstructor(router, inbounds, logFactory, options)
 }

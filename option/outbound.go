@@ -8,23 +8,24 @@ import (
 )
 
 type _Outbound struct {
-	Type                string                      `json:"type"`
-	Tag                 string                      `json:"tag,omitempty"`
-	DirectOptions       DirectOutboundOptions       `json:"-"`
-	SocksOptions        SocksOutboundOptions        `json:"-"`
-	HTTPOptions         HTTPOutboundOptions         `json:"-"`
-	ShadowsocksOptions  ShadowsocksOutboundOptions  `json:"-"`
-	VMessOptions        VMessOutboundOptions        `json:"-"`
-	TrojanOptions       TrojanOutboundOptions       `json:"-"`
-	WireGuardOptions    WireGuardOutboundOptions    `json:"-"`
-	HysteriaOptions     HysteriaOutboundOptions     `json:"-"`
-	TorOptions          TorOutboundOptions          `json:"-"`
-	SSHOptions          SSHOutboundOptions          `json:"-"`
-	ShadowTLSOptions    ShadowTLSOutboundOptions    `json:"-"`
-	ShadowsocksROptions ShadowsocksROutboundOptions `json:"-"`
-	VLESSOptions        VLESSOutboundOptions        `json:"-"`
-	SelectorOptions     SelectorOutboundOptions     `json:"-"`
-	URLTestOptions      URLTestOutboundOptions      `json:"-"`
+	Type                  string                        `json:"type"`
+	Tag                   string                        `json:"tag,omitempty"`
+	DirectOptions         DirectOutboundOptions         `json:"-"`
+	SocksOptions          SocksOutboundOptions          `json:"-"`
+	HTTPOptions           HTTPOutboundOptions           `json:"-"`
+	ShadowsocksOptions    ShadowsocksOutboundOptions    `json:"-"`
+	VMessOptions          VMessOutboundOptions          `json:"-"`
+	TrojanOptions         TrojanOutboundOptions         `json:"-"`
+	WireGuardOptions      WireGuardOutboundOptions      `json:"-"`
+	HysteriaOptions       HysteriaOutboundOptions       `json:"-"`
+	TorOptions            TorOutboundOptions            `json:"-"`
+	SSHOptions            SSHOutboundOptions            `json:"-"`
+	ShadowTLSOptions      ShadowTLSOutboundOptions      `json:"-"`
+	ShadowsocksROptions   ShadowsocksROutboundOptions   `json:"-"`
+	VLESSOptions          VLESSOutboundOptions          `json:"-"`
+	SelectorOptions       SelectorOutboundOptions       `json:"-"`
+	URLTestOptions        URLTestOutboundOptions        `json:"-"`
+	DynamicURLTestOptions DynamicURLTestOutboundOptions `json:"-"`
 }
 
 type Outbound _Outbound
@@ -64,6 +65,8 @@ func (h Outbound) MarshalJSON() ([]byte, error) {
 		v = h.SelectorOptions
 	case C.TypeURLTest:
 		v = h.URLTestOptions
+	case C.TypeDynamicURLTest:
+		v = h.DynamicURLTestOptions
 	default:
 		return nil, E.New("unknown outbound type: ", h.Type)
 	}
@@ -109,6 +112,8 @@ func (h *Outbound) UnmarshalJSON(bytes []byte) error {
 		v = &h.SelectorOptions
 	case C.TypeURLTest:
 		v = &h.URLTestOptions
+	case C.TypeDynamicURLTest:
+		v = &h.DynamicURLTestOptions
 	default:
 		return E.New("unknown outbound type: ", h.Type)
 	}
@@ -117,6 +122,77 @@ func (h *Outbound) UnmarshalJSON(bytes []byte) error {
 		return E.Cause(err, "outbound options")
 	}
 	return nil
+}
+
+func (h *Outbound) SetDetour(detour string) {
+	switch h.Type {
+	case C.TypeDirect:
+		h.DirectOptions.Detour = detour
+	case C.TypeBlock, C.TypeDNS:
+	case C.TypeSocks:
+		h.SocksOptions.Detour = detour
+	case C.TypeHTTP:
+		h.HTTPOptions.Detour = detour
+	case C.TypeShadowsocks:
+		h.ShadowsocksOptions.Detour = detour
+	case C.TypeVMess:
+		h.VMessOptions.Detour = detour
+	case C.TypeTrojan:
+		h.TrojanOptions.Detour = detour
+	case C.TypeWireGuard:
+		h.WireGuardOptions.Detour = detour
+	case C.TypeHysteria:
+		h.HysteriaOptions.Detour = detour
+	case C.TypeTor:
+		h.TorOptions.Detour = detour
+	case C.TypeSSH:
+		h.SSHOptions.Detour = detour
+	case C.TypeShadowTLS:
+		h.ShadowTLSOptions.Detour = detour
+	case C.TypeShadowsocksR:
+		h.ShadowsocksROptions.Detour = detour
+	case C.TypeVLESS:
+		h.VLESSOptions.Detour = detour
+	case C.TypeSelector:
+	case C.TypeURLTest:
+	case C.TypeDynamicURLTest:
+	default:
+	}
+}
+
+func (h *Outbound) TargetInfo() (scheme, host string, port uint16) {
+	switch h.Type {
+	case C.TypeDirect:
+	case C.TypeBlock, C.TypeDNS:
+	case C.TypeSocks:
+		scheme, host, port = C.TypeSocks, h.SocksOptions.Server, h.SocksOptions.ServerPort
+	case C.TypeHTTP:
+		scheme, host, port = C.TypeHTTP, h.HTTPOptions.Server, h.HTTPOptions.ServerPort
+	case C.TypeShadowsocks:
+		scheme, host, port = C.TypeShadowsocks, h.ShadowsocksOptions.Server, h.ShadowsocksOptions.ServerPort
+	case C.TypeVMess:
+		scheme, host, port = C.TypeVMess, h.VMessOptions.Server, h.VMessOptions.ServerPort
+	case C.TypeTrojan:
+		scheme, host, port = C.TypeTrojan, h.TrojanOptions.Server, h.TrojanOptions.ServerPort
+	case C.TypeWireGuard:
+		scheme, host, port = C.TypeWireGuard, h.WireGuardOptions.Server, h.WireGuardOptions.ServerPort
+	case C.TypeHysteria:
+		scheme, host, port = C.TypeHysteria, h.HysteriaOptions.Server, h.HysteriaOptions.ServerPort
+	case C.TypeTor:
+	case C.TypeSSH:
+		scheme, host, port = C.TypeSSH, h.SSHOptions.Server, h.SSHOptions.ServerPort
+	case C.TypeShadowTLS:
+		scheme, host, port = C.TypeShadowTLS, h.ShadowTLSOptions.Server, h.ShadowTLSOptions.ServerPort
+	case C.TypeShadowsocksR:
+		scheme, host, port = C.TypeShadowsocksR, h.ShadowsocksROptions.Server, h.ShadowsocksROptions.ServerPort
+	case C.TypeVLESS:
+		scheme, host, port = C.TypeVLESS, h.VLESSOptions.Server, h.VLESSOptions.ServerPort
+	case C.TypeSelector:
+	case C.TypeURLTest:
+	case C.TypeDynamicURLTest:
+	default:
+	}
+	return
 }
 
 type DialerOptions struct {

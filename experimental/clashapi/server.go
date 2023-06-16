@@ -37,6 +37,7 @@ func init() {
 var _ adapter.ClashServer = (*Server)(nil)
 
 type Server struct {
+	inbounds       []adapter.Inbound
 	router         adapter.Router
 	logger         log.Logger
 	httpServer     *http.Server
@@ -48,12 +49,13 @@ type Server struct {
 	cacheFile      adapter.ClashCacheFile
 }
 
-func NewServer(router adapter.Router, logFactory log.ObservableFactory, options option.ClashAPIOptions) (adapter.ClashServer, error) {
+func NewServer(router adapter.Router, inbounds []adapter.Inbound, logFactory log.ObservableFactory, options option.ClashAPIOptions) (adapter.ClashServer, error) {
 	trafficManager := trafficontrol.NewManager()
 	chiRouter := chi.NewRouter()
 	server := &Server{
-		router: router,
-		logger: logFactory.NewLogger("clash-api"),
+		inbounds: inbounds,
+		router:   router,
+		logger:   logFactory.NewLogger("clash-api"),
 		httpServer: &http.Server{
 			Addr:    options.ExternalController,
 			Handler: chiRouter,
@@ -92,6 +94,7 @@ func NewServer(router adapter.Router, logFactory log.ObservableFactory, options 
 		r.Get("/traffic", traffic(trafficManager))
 		r.Get("/version", version)
 		r.Mount("/configs", configRouter(server, logFactory, server.logger))
+		r.Mount("/inbounds", inbound(server, router))
 		r.Mount("/proxies", proxyRouter(server, router))
 		r.Mount("/rules", ruleRouter(router))
 		r.Mount("/connections", connectionRouter(trafficManager))
@@ -110,6 +113,8 @@ func NewServer(router adapter.Router, logFactory log.ObservableFactory, options 
 				fs.ServeHTTP(w, r)
 			})
 		})
+	} else {
+		chiRouter.Group(UI)
 	}
 	return server, nil
 }
