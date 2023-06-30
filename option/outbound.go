@@ -160,6 +160,40 @@ func (h *Outbound) SetDetour(detour string) {
 	}
 }
 
+func (h *Outbound) ReplaceServer(server string, serverPort uint16) {
+	switch h.Type {
+	case C.TypeDirect:
+	case C.TypeBlock, C.TypeDNS:
+	case C.TypeSocks:
+		h.SocksOptions.Server, h.SocksOptions.ServerPort = server, serverPort
+	case C.TypeHTTP:
+		h.HTTPOptions.Server, h.HTTPOptions.ServerPort = server, serverPort
+	case C.TypeShadowsocks:
+		h.ShadowsocksOptions.Server, h.ShadowsocksOptions.ServerPort = server, serverPort
+	case C.TypeVMess:
+		h.VMessOptions.Server, h.VMessOptions.ServerPort = server, serverPort
+	case C.TypeTrojan:
+		h.TrojanOptions.Server, h.TrojanOptions.ServerPort = server, serverPort
+	case C.TypeWireGuard:
+		h.WireGuardOptions.Server, h.WireGuardOptions.ServerPort = server, serverPort
+	case C.TypeHysteria:
+		h.HysteriaOptions.Server, h.HysteriaOptions.ServerPort = server, serverPort
+	case C.TypeTor:
+	case C.TypeSSH:
+		h.SSHOptions.Server, h.SSHOptions.ServerPort = server, serverPort
+	case C.TypeShadowTLS:
+		h.ShadowTLSOptions.Server, h.ShadowTLSOptions.ServerPort = server, serverPort
+	case C.TypeShadowsocksR:
+		h.ShadowsocksROptions.Server, h.ShadowsocksROptions.ServerPort = server, serverPort
+	case C.TypeVLESS:
+		h.VLESSOptions.Server, h.VLESSOptions.ServerPort = server, serverPort
+	case C.TypeSelector:
+	case C.TypeURLTest:
+	case C.TypeDynamicURLTest:
+	default:
+	}
+}
+
 func (h *Outbound) TargetInfo() (scheme, host string, port uint16) {
 	switch h.Type {
 	case C.TypeDirect:
