@@ -163,6 +163,21 @@ func newFackConn(clientConn net.Conn, process fcRequestProcesser) net.Conn {
 	}
 }
 
+func (f *fakeConn) Close() error {
+	return f.Conn.Close()
+}
+
+func (f *fakeConn) Read(b []byte) (n int, err error) {
+	// read from pipe (pipe write by reqestProcesser)
+	read, err := f.pipeReader.Read(b)
+	return read, err
+}
+
+func (f *fakeConn) Write(p []byte) (n int, err error) {
+	write, err := f.Conn.Write(p)
+	return write, err
+}
+
 func CopyConn(ctx context.Context, conn net.Conn, serverConn net.Conn) error {
 	err := checkContext(ctx)
 	if err != nil {
