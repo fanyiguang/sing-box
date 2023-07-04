@@ -92,6 +92,8 @@ func proxyInfo(server *Server, detour adapter.Outbound) *badjson.JSONObject {
 		clashType = "Selector"
 	case C.TypeURLTest:
 		clashType = "URLTest"
+	case C.TypeDynamicURLTest:
+		clashType = "DynamicURLTest"
 	default:
 		clashType = "Direct"
 	}

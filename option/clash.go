@@ -20,3 +20,10 @@ type URLTestOutboundOptions struct {
 	Interval  Duration `json:"interval,omitempty"`
 	Tolerance uint16   `json:"tolerance,omitempty"`
 }
+
+type DynamicURLTestOutboundOptions struct {
+	Outbounds []string `json:"outbounds"`
+	URL       string   `json:"url,omitempty"`
+	Interval  Duration `json:"interval,omitempty"`
+	Tolerance uint16   `json:"tolerance,omitempty"`
+}

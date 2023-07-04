@@ -77,6 +77,17 @@ func (r *Rule) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
+func (r Rule) Tag() string {
+	switch r.Type {
+	case C.RuleTypeDefault:
+		return r.DefaultOptions.Tag
+	case C.RuleTypeLogical:
+		return r.LogicalOptions.Tag
+	default:
+		return ""
+	}
+}
+
 type DefaultRule struct {
 	Inbound         Listable[string] `json:"inbound,omitempty"`
 	IPVersion       int              `json:"ip_version,omitempty"`
@@ -104,6 +115,7 @@ type DefaultRule struct {
 	ClashMode       string           `json:"clash_mode,omitempty"`
 	Invert          bool             `json:"invert,omitempty"`
 	Outbound        string           `json:"outbound,omitempty"`
+	Tag             string           `json:"tag,omitempty"`
 }
 
 func (r DefaultRule) IsValid() bool {
@@ -118,6 +130,7 @@ type LogicalRule struct {
 	Rules    []DefaultRule `json:"rules,omitempty"`
 	Invert   bool          `json:"invert,omitempty"`
 	Outbound string        `json:"outbound,omitempty"`
+	Tag      string        `json:"tag,omitempty"`
 }
 
 func (r LogicalRule) IsValid() bool {

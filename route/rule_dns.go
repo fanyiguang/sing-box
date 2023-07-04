@@ -200,6 +200,10 @@ func (r *DefaultDNSRule) Type() string {
 	return C.RuleTypeDefault
 }
 
+func (r *DefaultDNSRule) Tag() string {
+	return ""
+}
+
 func (r *DefaultDNSRule) Start() error {
 	for _, item := range r.allItems {
 		err := common.Start(item)
@@ -343,6 +347,10 @@ func NewLogicalDNSRule(router adapter.Router, logger log.ContextLogger, options 
 
 func (r *LogicalDNSRule) Type() string {
 	return C.RuleTypeLogical
+}
+
+func (r *LogicalDNSRule) Tag() string {
+	return ""
 }
 
 func (r *LogicalDNSRule) UpdateGeosite() error {

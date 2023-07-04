@@ -124,8 +124,8 @@ func (c *VisionConn) Read(p []byte) (n int, err error) {
 		if err != nil {
 			return 0, err
 		}
-		defer buffer.FullReset()
 		bufferBytes = buffer.Bytes()
+		buffer.FullReset()
 	}
 	if c.withinPaddingBuffers || c.numberOfPacketToFilter > 0 {
 		buffers := c.unPadding(bufferBytes)

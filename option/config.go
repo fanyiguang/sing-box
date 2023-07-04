@@ -43,4 +43,12 @@ type LogOptions struct {
 	Output       string `json:"output,omitempty"`
 	Timestamp    bool   `json:"timestamp,omitempty"`
 	DisableColor bool   `json:"-"`
+	Rotate
+}
+
+type Rotate struct {
+	MaxSize    int  `json:"max_size,omitempty"`    // 一个文件的大小
+	MaxBackups int  `json:"max_backups,omitempty"` // 最多同时保存几个份文件
+	MaxAge     int  `json:"max_age,omitempty"`     // 一个文件最多同时存在几天天
+	Disabled   bool `json:"rotate,omitempty"`      // 日志倒换开关，开启后io.writer引用：lumberjack.Logger
 }

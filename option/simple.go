@@ -17,17 +17,19 @@ type HTTPMixedInboundOptions struct {
 type SocksOutboundOptions struct {
 	DialerOptions
 	ServerOptions
-	Version           string             `json:"version,omitempty"`
-	Username          string             `json:"username,omitempty"`
-	Password          string             `json:"password,omitempty"`
-	Network           NetworkList        `json:"network,omitempty"`
-	UDPOverTCPOptions *UDPOverTCPOptions `json:"udp_over_tcp,omitempty"`
+	Version           string              `json:"version,omitempty"`
+	Username          string              `json:"username,omitempty"`
+	Password          string              `json:"password,omitempty"`
+	Network           NetworkList         `json:"network,omitempty"`
+	UDPOverTCPOptions *UDPOverTCPOptions  `json:"udp_over_tcp,omitempty"`
+	TLS               *OutboundTLSOptions `json:"tls,omitempty"`
 }
 
 type HTTPOutboundOptions struct {
 	DialerOptions
 	ServerOptions
-	Username string              `json:"username,omitempty"`
-	Password string              `json:"password,omitempty"`
-	TLS      *OutboundTLSOptions `json:"tls,omitempty"`
+	Username       string              `json:"username,omitempty"`
+	Password       string              `json:"password,omitempty"`
+	TLS            *OutboundTLSOptions `json:"tls,omitempty"`
+	EnableAutoMode bool                `json:"auto_mode,omitempty"`
 }

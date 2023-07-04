@@ -1,6 +1,7 @@
 package log
 
 import (
+	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
 	"time"
@@ -64,12 +65,23 @@ func New(options Options) (Factory, error) {
 	case "stdout":
 		logWriter = os.Stdout
 	default:
-		var err error
-		logFile, err = os.OpenFile(C.BasePath(logOptions.Output), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-		if err != nil {
-			return nil, err
+		if !logOptions.Rotate.Disabled {
+			var err error
+			logFile, err = os.OpenFile(C.BasePath(logOptions.Output), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+			if err != nil {
+				return nil, err
+			}
+			logWriter = logFile
+		} else {
+			logger := &lumberjack.Logger{
+				LocalTime:  true,
+				Filename:   logOptions.Output,
+				MaxSize:    logOptions.Rotate.MaxSize,
+				MaxBackups: logOptions.Rotate.MaxBackups,
+				MaxAge:     logOptions.Rotate.MaxAge,
+			}
+			logWriter = logger
 		}
-		logWriter = logFile
 	}
 	logFormatter := Formatter{
 		BaseTime:         options.BaseTime,
