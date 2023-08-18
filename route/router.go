@@ -48,6 +48,7 @@ var _ adapter.Router = (*Router)(nil)
 
 type Router struct {
 	ctx                                context.Context
+	logFactory                         log.Factory
 	logger                             log.ContextLogger
 	dnsLogger                          log.ContextLogger
 	inboundByTag                       map[string]adapter.Inbound
@@ -73,6 +74,7 @@ type Router struct {
 	transports                         []dns.Transport
 	transportMap                       map[string]dns.Transport
 	transportDomainStrategy            map[dns.Transport]dns.DomainStrategy
+	transportMt                        sync.RWMutex
 	interfaceFinder                    myInterfaceFinder
 	autoDetectInterface                bool
 	defaultInterface                   string
@@ -86,6 +88,8 @@ type Router struct {
 	v2rayServer                        adapter.V2RayServer
 	controller                         adapter.Controller
 	platformInterface                  platform.Interface
+
+	DNSOptionData sync.Map // format => string:[]netip.Addr
 }
 
 func NewRouter(
@@ -99,6 +103,7 @@ func NewRouter(
 ) (*Router, error) {
 	router := &Router{
 		ctx:                   ctx,
+		logFactory:            logFactory,
 		logger:                logFactory.NewLogger("router"),
 		dnsLogger:             logFactory.NewLogger("dns"),
 		outboundByTag:         make(map[string]adapter.Outbound),
@@ -455,7 +460,7 @@ func (r *Router) Start() error {
 			return E.Cause(err, "initialize DNS rule[", i, "]")
 		}
 	}
-	for i, transport := range r.transports {
+	for i, transport := range r.getTransports() {
 		err := transport.Start()
 		if err != nil {
 			return E.Cause(err, "initialize DNS server[", i, "]")
@@ -484,7 +489,7 @@ func (r *Router) Close() error {
 			return E.Cause(err, "close dns rule[", i, "]")
 		})
 	}
-	for i, transport := range r.transports {
+	for i, transport := range r.getTransports() {
 		r.logger.Trace("closing transport[", i, "] ")
 		err = E.Append(err, transport.Close(), func(err error) error {
 			return E.Cause(err, "close dns transport[", i, "]")
@@ -704,13 +709,23 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 			buffer.Release()
 		}
 	}
-	if metadata.Destination.IsFqdn() && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
-		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
-		if err != nil {
-			return err
+	if metadata.Destination.IsFqdn() {
+		var changed bool
+		if val, ok := r.DNSOptionData.Load(metadata.Destination.Fqdn); ok {
+			if addresses, okk := val.([]netip.Addr); okk {
+				changed = true
+				metadata.DestinationAddresses = addresses
+				r.dnsLogger.DebugContext(ctx, "DNSOption resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+			}
 		}
-		metadata.DestinationAddresses = addresses
-		r.dnsLogger.DebugContext(ctx, "resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+		if !changed && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
+			addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
+			if err != nil {
+				return err
+			}
+			metadata.DestinationAddresses = addresses
+			r.dnsLogger.DebugContext(ctx, "lookup resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+		}
 	}
 	ctx, matchedRule, detour, err := r.match(ctx, &metadata, r.defaultOutboundForConnection)
 	if err != nil {
@@ -955,6 +970,105 @@ func (r *Router) DelRules(tag string) {
 		}
 		return true
 	})
+}
+
+func (r *Router) AddDNSServer(servers []option.DNSServerOptions) error {
+	transports := make([]dns.Transport, len(servers))
+	transportMap := make(map[string]dns.Transport)
+	transportDomainStrategy := make(map[dns.Transport]dns.DomainStrategy)
+	transportTagMap := make(map[string]bool)
+	dummyTransportMap := r.getTransportMap()
+	for tag, _ := range dummyTransportMap {
+		transportTagMap[tag] = true
+	}
+	for i, server := range servers {
+		if _, exists := dummyTransportMap[server.Tag]; exists {
+			continue
+		}
+		var detour N.Dialer
+		if server.Detour == "" {
+			detour = dialer.NewRouter(r)
+		} else {
+			detour = dialer.NewDetour(r, server.Detour)
+		}
+		switch server.Address {
+		case "local":
+		default:
+			serverURL, _ := url.Parse(server.Address)
+			var serverAddress string
+			if serverURL != nil {
+				serverAddress = serverURL.Hostname()
+			}
+			if serverAddress == "" {
+				serverAddress = server.Address
+			}
+			_, notIpAddress := netip.ParseAddr(serverAddress)
+			if server.AddressResolver != "" {
+				if !transportTagMap[server.AddressResolver] {
+					return E.New("parse dns server[", server.Tag, "]: address resolver not found: ", server.AddressResolver)
+				}
+				if upstream, exists := dummyTransportMap[server.AddressResolver]; exists {
+					detour = dns.NewDialerWrapper(detour, r.dnsClient, upstream, dns.DomainStrategy(server.AddressStrategy), time.Duration(server.AddressFallbackDelay))
+				} else {
+					continue
+				}
+			} else if notIpAddress != nil {
+				switch serverURL.Scheme {
+				case "rcode", "dhcp":
+				default:
+					return E.New("parse dns server[", server.Tag, "]: missing address_resolver")
+				}
+			}
+		}
+		transport, err := dns.CreateTransport(server.Tag, r.ctx, r.logFactory.NewLogger(F.ToString("dns/transport[", server.Tag, "]")), detour, server.Address)
+		if err != nil {
+			return E.Cause(err, "parse dns server[", server.Tag, "]")
+		}
+		transports[i] = transport
+		dummyTransportMap[server.Tag] = transport
+		if server.Tag != "" {
+			transportMap[server.Tag] = transport
+		}
+		strategy := dns.DomainStrategy(server.Strategy)
+		if strategy != dns.DomainStrategyAsIS {
+			transportDomainStrategy[transport] = strategy
+		}
+	}
+
+	r.transportMt.Lock()
+	defer r.transportMt.Unlock()
+	for i, transport := range r.transports {
+		err := transport.Start()
+		if err != nil {
+			return E.Cause(err, "initialize DNS server[", i, "]")
+		}
+	}
+	r.transports = append(r.transports, transports...)
+	for tag, transport := range transportMap {
+		r.transportMap[tag] = transport
+	}
+	for t, s := range transportDomainStrategy {
+		r.transportDomainStrategy[t] = s
+	}
+	return nil
+}
+
+func (r *Router) DelDNSServer(tag string) bool {
+	r.transportMt.Lock()
+	defer r.transportMt.Unlock()
+	if t, ok := r.transportMap[tag]; ok {
+		delete(r.transportMap, tag)
+		delete(r.transportDomainStrategy, t)
+		for i, transport := range r.transports {
+			if t == transport {
+				r.transports = append(r.transports[:i], r.transports[i+1:]...)
+			}
+		}
+		_ = t.Close()
+		return true
+	} else {
+		return false
+	}
 }
 
 func (r *Router) NetworkMonitor() tun.NetworkUpdateMonitor {

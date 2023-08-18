@@ -27,8 +27,8 @@ func (r *Router) matchDNS(ctx context.Context) (context.Context, dns.Transport, 
 			}
 			detour := rule.Outbound()
 			r.dnsLogger.DebugContext(ctx, "match[", i, "] ", rule.String(), " => ", detour)
-			if transport, loaded := r.transportMap[detour]; loaded {
-				if domainStrategy, dsLoaded := r.transportDomainStrategy[transport]; dsLoaded {
+			if transport, loaded := r.getTransportMap()[detour]; loaded {
+				if domainStrategy, dsLoaded := r.getTransportDomainStrategy()[transport]; dsLoaded {
 					return ctx, transport, domainStrategy
 				} else {
 					return ctx, transport, r.defaultDomainStrategy
@@ -37,7 +37,7 @@ func (r *Router) matchDNS(ctx context.Context) (context.Context, dns.Transport, 
 			r.dnsLogger.ErrorContext(ctx, "transport not found: ", detour)
 		}
 	}
-	if domainStrategy, dsLoaded := r.transportDomainStrategy[r.defaultTransport]; dsLoaded {
+	if domainStrategy, dsLoaded := r.getTransportDomainStrategy()[r.defaultTransport]; dsLoaded {
 		return ctx, r.defaultTransport, domainStrategy
 	} else {
 		return ctx, r.defaultTransport, r.defaultDomainStrategy
@@ -72,6 +72,12 @@ func (r *Router) Exchange(ctx context.Context, message *mDNS.Msg) (*mDNS.Msg, er
 	return response, err
 }
 
+func (r *Router) AddOptionDNS(data map[string][]netip.Addr) {
+	for domain, addr := range data {
+		r.DNSOptionData.Store(domain, addr)
+	}
+}
+
 func (r *Router) Lookup(ctx context.Context, domain string, strategy dns.DomainStrategy) ([]netip.Addr, error) {
 	r.dnsLogger.DebugContext(ctx, "lookup domain ", domain)
 	ctx, metadata := adapter.AppendContext(ctx)
@@ -95,7 +101,25 @@ func (r *Router) Lookup(ctx context.Context, domain string, strategy dns.DomainS
 }
 
 func (r *Router) LookupDefault(ctx context.Context, domain string) ([]netip.Addr, error) {
-	return r.Lookup(ctx, domain, dns.DomainStrategyAsIS)
+	return r.Lookup(ctx, domain, dns.DomainStrategyUseIPv4)
+}
+
+func (r *Router) getTransportDomainStrategy() map[dns.Transport]dns.DomainStrategy {
+	r.transportMt.RLock()
+	defer r.transportMt.RUnlock()
+	return r.transportDomainStrategy
+}
+
+func (r *Router) getTransportMap() map[string]dns.Transport {
+	r.transportMt.RLock()
+	defer r.transportMt.RUnlock()
+	return r.transportMap
+}
+
+func (r *Router) getTransports() []dns.Transport {
+	r.transportMt.RLock()
+	defer r.transportMt.RUnlock()
+	return r.transports
 }
 
 func LogDNSAnswers(logger log.ContextLogger, ctx context.Context, domain string, answers []mDNS.RR) {
