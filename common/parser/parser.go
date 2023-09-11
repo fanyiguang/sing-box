@@ -166,8 +166,8 @@ func GetOutboundFromURL(url *url.URL, index int, detourName string) (option.Outb
 	switch strings.ToLower(url.Scheme) {
 	case constant.TypeSocks, "socks5", "auto":
 		return parseOutboundSocks(url, index, detourName, false)
-	//case "ssl":
-	//	return parseOutboundSocks(url, index, detourName, true)
+	case "ssl":
+		return parseOutboundSocks(url, index, detourName, true)
 	case constant.TypeHTTP:
 		return parseOutboundHttp(url, index, detourName, false)
 	case "https":
@@ -187,13 +187,13 @@ func parseOutboundSocks(url *url.URL, index int, detourName string, enableTLS bo
 		return option.Outbound{}, err
 	}
 
-	//var tls *option.OutboundTLSOptions
-	//if enableTLS {
-	//	tls = &option.OutboundTLSOptions{
-	//		Enabled:  true,
-	//		Insecure: true,
-	//	}
-	//}
+	var tls *option.OutboundTLSOptions
+	if enableTLS {
+		tls = &option.OutboundTLSOptions{
+			Enabled:  true,
+			Insecure: true,
+		}
+	}
 
 	c := option.Outbound{
 		Type: constant.TypeSocks,
@@ -206,7 +206,7 @@ func parseOutboundSocks(url *url.URL, index int, detourName string, enableTLS bo
 				Server:     addr.String(),
 				ServerPort: port,
 			},
-			//TLS: tls,
+			TLS: tls,
 		},
 	}
 	if auth != nil {
