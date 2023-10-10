@@ -9,6 +9,7 @@ import (
 	"github.com/sagernet/sing-tun"
 	E "github.com/sagernet/sing/common/exceptions"
 	F "github.com/sagernet/sing/common/format"
+	"github.com/shirou/gopsutil/process"
 )
 
 type Searcher interface {
@@ -27,6 +28,12 @@ type Info struct {
 	PackageName string
 	User        string
 	UserId      int32
+	PID         uint32
+}
+
+type processInfo struct {
+	Name string
+	PID  uint32
 }
 
 func FindProcessInfo(searcher Searcher, ctx context.Context, network string, source netip.AddrPort, destination netip.AddrPort) (*Info, error) {
@@ -41,4 +48,20 @@ func FindProcessInfo(searcher Searcher, ctx context.Context, network string, sou
 		}
 	}
 	return info, nil
+}
+
+func GetAllParentID(PID uint32) ([]int32, error) {
+	var ids []int32
+	proc, err := process.NewProcess(int32(PID))
+	if err != nil {
+		return nil, err
+	}
+	for true {
+		ids = append(ids, proc.Pid)
+		proc, err = proc.Parent()
+		if err != nil {
+			break
+		}
+	}
+	return ids, nil
 }

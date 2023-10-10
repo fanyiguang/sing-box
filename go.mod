@@ -36,6 +36,7 @@ require (
 	github.com/sagernet/utls v0.0.0-20230309024959-6732c2ab36f2
 	github.com/sagernet/websocket v0.0.0-20220913015213-615516348b4e
 	github.com/sagernet/wireguard-go v0.0.0-20221116151939-c99467f53f2c
+	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.3
 	go.etcd.io/bbolt v1.3.7
@@ -44,7 +45,7 @@ require (
 	golang.org/x/crypto v0.9.0
 	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc
 	golang.org/x/net v0.10.0
-	golang.org/x/sys v0.8.0
+	golang.org/x/sys v0.11.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
@@ -59,6 +60,7 @@ require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/cloudflare/circl v1.2.1-0.20221019164342-6ab4dfed8f3c // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -81,8 +83,11 @@ require (
 	github.com/sagernet/netlink v0.0.0-20220905062125-8043b4a9aa97 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/tklauser/go-sysconf v0.3.12 // indirect
+	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/u-root/uio v0.0.0-20230220225925-ffce2a382923 // indirect
 	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect
+	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect

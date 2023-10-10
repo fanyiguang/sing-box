@@ -46,6 +46,7 @@ type InboundContext struct {
 	SourceGeoIPCode      string
 	GeoIPCode            string
 	ProcessInfo          *process.Info
+	ProcessParentIds     []int32
 
 	// dns cache
 
