@@ -3,6 +3,7 @@ package route
 import (
 	"context"
 	"fmt"
+	"github.com/sagernet/sing-box/common/host"
 	"io"
 	"net"
 	"net/http"
@@ -86,6 +87,7 @@ type Router struct {
 	v2rayServer                        adapter.V2RayServer
 	controller                         adapter.Controller
 	platformInterface                  platform.Interface
+	hosts                              []*host.Host
 }
 
 func NewRouter(
@@ -123,6 +125,13 @@ func NewRouter(
 			return nil, E.Cause(err, "parse rule[", i, "]")
 		}
 		router.rules = append(router.rules, routeRule)
+	}
+	for i, h := range options.Hosts {
+		_host, err := host.New(h.Domain, h.Addresses)
+		if err != nil {
+			return nil, E.Cause(err, "parse host[", i, "]")
+		}
+		router.hosts = append(router.hosts, _host)
 	}
 	for i, dnsRuleOptions := range dnsOptions.Rules {
 		dnsRule, err := NewDNSRule(router, router.logger, dnsRuleOptions)
@@ -704,7 +713,13 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 			buffer.Release()
 		}
 	}
-	if metadata.Destination.IsFqdn() && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
+	for _, h := range r.hosts {
+		if h.Match(metadata.Destination.Fqdn) {
+			metadata.DestinationAddresses = h.Addresses()
+			r.dnsLogger.DebugContext(ctx, "host bind resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+		}
+	}
+	if metadata.Destination.IsFqdn() && metadata.DestinationAddresses == nil && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
 		if err != nil {
 			return err
