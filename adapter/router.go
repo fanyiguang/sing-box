@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"context"
+	"github.com/sagernet/sing-box/option"
 	"net"
 	"net/netip"
 
@@ -46,6 +47,8 @@ type Router interface {
 	AddRules([]Rule)
 	DelRules(tag string)
 	UpdateRule(tag string, rule Rule)
+	AddDNSServer(servers []option.DNSServerOptions) error
+	DelDNSServer(tag string) bool
 
 	TimeService
 
