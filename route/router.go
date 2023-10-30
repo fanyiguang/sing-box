@@ -724,11 +724,11 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 	}
 	if metadata.Destination.IsFqdn() && metadata.DestinationAddresses == nil && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
-		if err != nil {
-			return err
+		if err == nil { // 产品特殊需求本地DNS失败后台会继续尝试走远程DNS
+			metadata.DestinationAddresses = addresses
+			r.dnsLogger.DebugContext(ctx, "resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
 		}
-		metadata.DestinationAddresses = addresses
-		r.dnsLogger.DebugContext(ctx, "resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+		//return err
 	}
 	ctx, matchedRule, detour, err := r.match(ctx, &metadata, r.defaultOutboundForConnection)
 	if err != nil {
