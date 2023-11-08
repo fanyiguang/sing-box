@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/netip"
 	"strings"
+	"time"
 
 	"github.com/sagernet/sing-box/adapter"
 	C "github.com/sagernet/sing-box/constant"
@@ -80,7 +81,7 @@ func (r *Router) Lookup(ctx context.Context, domain string, strategy dns.DomainS
 	if strategy == dns.DomainStrategyAsIS {
 		strategy = transportStrategy
 	}
-	ctx, cancel := context.WithTimeout(ctx, C.DNSTimeout)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	addrs, err := r.dnsClient.Lookup(ctx, transport, domain, strategy)
 	if len(addrs) > 0 {
