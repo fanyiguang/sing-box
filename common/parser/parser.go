@@ -174,6 +174,8 @@ func GetOutboundFromURL(url *url.URL, index int, detourName string) (option.Outb
 		return parseOutboundHttp(url, index, detourName, true)
 	case "ssh", "sshd":
 		return parseOutboundSSH(url, index, detourName)
+	case "ss", "shadowsocks":
+		return parseOutboundSS(url, index, detourName)
 	default:
 		return option.Outbound{}, exceptions.New("unknown outbound type ", url.Scheme)
 	}
@@ -240,6 +242,34 @@ func parseOutboundSSH(url *url.URL, index int, detourName string) (option.Outbou
 	if auth != nil {
 		c.SSHOptions.User = auth.Username
 		c.SSHOptions.Password = auth.Password
+	}
+	return c, nil
+}
+
+func parseOutboundSS(url *url.URL, index int, detourName string) (option.Outbound, error) {
+	auth := GetAuthInfoFromUrl(url)
+
+	addr, port, err := GetHostAndPortFromUrl(url)
+	if err != nil {
+		return option.Outbound{}, err
+	}
+
+	c := option.Outbound{
+		Type: constant.TypeShadowsocks,
+		Tag:  "jump-" + strconv.Itoa(index),
+		ShadowsocksOptions: option.ShadowsocksOutboundOptions{
+			DialerOptions: option.DialerOptions{
+				Detour: detourName,
+			},
+			ServerOptions: option.ServerOptions{
+				Server:     addr.String(),
+				ServerPort: port,
+			},
+		},
+	}
+	if auth != nil {
+		c.ShadowsocksOptions.Method = auth.Username
+		c.ShadowsocksOptions.Password = auth.Password
 	}
 	return c, nil
 }
