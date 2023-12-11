@@ -33,3 +33,9 @@ type HTTPOutboundOptions struct {
 	TLS            *OutboundTLSOptions `json:"tls,omitempty"`
 	EnableAutoMode bool                `json:"auto_mode,omitempty"`
 }
+
+type SystemOutboundOptions struct {
+	DialerOptions
+	PacEngine      string `json:"pac_engine"`      // system or javascript, default: javascript
+	ReloadInterval int    `json:"reload_interval"` // unit：second, default 3 second
+}

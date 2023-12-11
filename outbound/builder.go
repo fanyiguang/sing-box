@@ -51,6 +51,8 @@ func New(ctx context.Context, router adapter.Router, logger log.ContextLogger, t
 		return NewShadowsocksR(ctx, router, logger, tag, options.ShadowsocksROptions)
 	case C.TypeVLESS:
 		return NewVLESS(ctx, router, logger, tag, options.VLESSOptions)
+	case C.TypeSystem:
+		return NewSystem(router, logger, options.Tag, options.SystemOptions)
 	case C.TypeSelector:
 		return NewSelector(router, logger, tag, options.SelectorOptions)
 	case C.TypeURLTest:
