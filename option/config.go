@@ -23,7 +23,7 @@ type Options _Options
 
 func (o *Options) UnmarshalJSON(content []byte) error {
 	decoder := json.NewDecoder(json.NewCommentFilter(bytes.NewReader(content)))
-	decoder.DisallowUnknownFields()
+	//decoder.DisallowUnknownFields()
 	err := decoder.Decode((*_Options)(o))
 	if err == nil {
 		return nil

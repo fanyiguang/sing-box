@@ -70,6 +70,6 @@ func UnmarshallExcluded(inputContent []byte, parentObject any, object any) error
 		return err
 	}
 	decoder := json.NewDecoder(bytes.NewReader(inputContent))
-	decoder.DisallowUnknownFields()
+	//decoder.DisallowUnknownFields()
 	return decoder.Decode(object)
 }
