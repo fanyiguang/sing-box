@@ -53,6 +53,7 @@ type Router struct {
 	dnsLogger                          log.ContextLogger
 	logFactory                         log.Factory
 	inboundByTag                       map[string]adapter.Inbound
+	inboundMt                          sync.RWMutex
 	outbounds                          []adapter.Outbound
 	outboundByTag                      map[string]adapter.Outbound
 	outboundMt                         sync.RWMutex
@@ -598,6 +599,24 @@ func (r *Router) AddOutbounds(outbounds []adapter.Outbound, replace bool) error 
 		}
 	}
 	return nil
+}
+
+func (r *Router) AddInbound(inbound adapter.Inbound, replace bool) error {
+	r.inboundMt.Lock()
+	defer r.inboundMt.Unlock()
+	if in, ok := r.inboundByTag[inbound.Tag()]; ok {
+		if replace {
+			err := in.Close()
+			if err != nil {
+				return err
+			}
+		} else {
+			return E.New("inbound[", inbound.Tag(), "] already")
+		}
+	}
+	r.inboundByTag[inbound.Tag()] = inbound
+
+	return common.Start(inbound)
 }
 
 func (r *Router) addOutbounds(outbounds []adapter.Outbound, replace bool) error {

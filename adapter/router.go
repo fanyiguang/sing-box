@@ -18,6 +18,8 @@ import (
 type Router interface {
 	Service
 
+	AddInbound(Inbound, bool) error
+
 	Outbounds() []Outbound
 	Outbound(tag string) (Outbound, bool)
 	DelOutbound(tag string)

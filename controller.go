@@ -2,11 +2,33 @@ package box
 
 import (
 	"github.com/sagernet/sing-box/adapter"
+	"github.com/sagernet/sing-box/inbound"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing-box/outbound"
 	"github.com/sagernet/sing-box/route"
 	F "github.com/sagernet/sing/common/format"
 )
+
+func (s *Box) AddInbound(inboundOption option.Inbound, replace bool) error {
+	var tag string
+	if inboundOption.Tag != "" {
+		tag = inboundOption.Tag
+	} else {
+		tag = F.ToString(0)
+	}
+	in, err := inbound.New(
+		s.ctx,
+		s.router,
+		s.logFactory.NewLogger(F.ToString("inbound/", inboundOption.Type, "[", tag, "]")),
+		inboundOption,
+		nil,
+	)
+	if err != nil {
+		s.logger.Warn("parse inbound error: ", err)
+		return err
+	}
+	return s.router.AddInbound(in, replace)
+}
 
 func (s *Box) AddOutbounds(outboundOptions []option.Outbound, replace bool) error {
 	var outbounds []adapter.Outbound
