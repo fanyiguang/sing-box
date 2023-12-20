@@ -19,6 +19,7 @@ type Router interface {
 	Service
 
 	AddInbound(Inbound, bool) error
+	DelInbound(tag string)
 
 	Outbounds() []Outbound
 	Outbound(tag string) (Outbound, bool)

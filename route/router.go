@@ -619,6 +619,18 @@ func (r *Router) AddInbound(inbound adapter.Inbound, replace bool) error {
 	return common.Start(inbound)
 }
 
+func (r *Router) Inbound() map[string]adapter.Inbound {
+	r.inboundMt.RLock()
+	defer r.inboundMt.RUnlock()
+	return r.inboundByTag
+}
+
+func (r *Router) DelInbound(tag string) {
+	r.inboundMt.Lock()
+	defer r.inboundMt.Unlock()
+	delete(r.inboundByTag, tag)
+}
+
 func (r *Router) addOutbounds(outbounds []adapter.Outbound, replace bool) error {
 	r.outboundMt.Lock()
 	defer r.outboundMt.Unlock()
@@ -661,7 +673,7 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 		if metadata.LastInbound == metadata.InboundDetour {
 			return E.New("routing loop on detour: ", metadata.InboundDetour)
 		}
-		detour := r.inboundByTag[metadata.InboundDetour]
+		detour := r.Inbound()[metadata.InboundDetour]
 		if detour == nil {
 			return E.New("inbound detour not found: ", metadata.InboundDetour)
 		}
@@ -774,7 +786,7 @@ func (r *Router) RoutePacketConnection(ctx context.Context, conn N.PacketConn, m
 		if metadata.LastInbound == metadata.InboundDetour {
 			return E.New("routing loop on detour: ", metadata.InboundDetour)
 		}
-		detour := r.inboundByTag[metadata.InboundDetour]
+		detour := r.Inbound()[metadata.InboundDetour]
 		if detour == nil {
 			return E.New("inbound detour not found: ", metadata.InboundDetour)
 		}

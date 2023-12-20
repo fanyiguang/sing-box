@@ -30,6 +30,10 @@ func (s *Box) AddInbound(inboundOption option.Inbound, replace bool) error {
 	return s.router.AddInbound(in, replace)
 }
 
+func (s *Box) DelInbound(tag string) {
+	s.router.DelInbound(tag)
+}
+
 func (s *Box) AddOutbounds(outboundOptions []option.Outbound, replace bool) error {
 	var outbounds []adapter.Outbound
 	for i, outboundOption := range outboundOptions {
