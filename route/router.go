@@ -628,7 +628,10 @@ func (r *Router) Inbound() map[string]adapter.Inbound {
 func (r *Router) DelInbound(tag string) {
 	r.inboundMt.Lock()
 	defer r.inboundMt.Unlock()
-	delete(r.inboundByTag, tag)
+	if inbound, ok := r.inboundByTag[tag]; ok {
+		_ = common.Close(inbound)
+		delete(r.inboundByTag, tag)
+	}
 }
 
 func (r *Router) addOutbounds(outbounds []adapter.Outbound, replace bool) error {
