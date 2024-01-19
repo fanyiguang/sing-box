@@ -604,6 +604,10 @@ func (r *Router) AddOutbounds(outbounds []adapter.Outbound, replace bool) error 
 func (r *Router) AddInbound(inbound adapter.Inbound, replace bool) error {
 	r.inboundMt.Lock()
 	defer r.inboundMt.Unlock()
+	err := common.Start(inbound)
+	if err != nil {
+		return err
+	}
 	if in, ok := r.inboundByTag[inbound.Tag()]; ok {
 		if replace {
 			err := in.Close()
@@ -615,8 +619,7 @@ func (r *Router) AddInbound(inbound adapter.Inbound, replace bool) error {
 		}
 	}
 	r.inboundByTag[inbound.Tag()] = inbound
-
-	return common.Start(inbound)
+	return nil
 }
 
 func (r *Router) Inbound() map[string]adapter.Inbound {
