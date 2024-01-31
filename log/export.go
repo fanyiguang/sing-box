@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"github.com/sagernet/sing-box/option"
 	"os"
 	"time"
 )
@@ -16,6 +17,7 @@ func init() {
 		"",
 		nil,
 		false,
+		option.Rotate{},
 	).Logger()
 }
 

@@ -35,12 +35,13 @@ func NewHTTP(ctx context.Context, router adapter.Router, logger log.ContextLogge
 	}
 	return &HTTP{
 		myOutboundAdapter{
-			protocol:     C.TypeHTTP,
-			network:      []string{N.NetworkTCP},
-			router:       router,
-			logger:       logger,
-			tag:          tag,
-			dependencies: withDialerDependency(options.DialerOptions),
+			protocol:       C.TypeHTTP,
+			network:        []string{N.NetworkTCP},
+			router:         router,
+			logger:         logger,
+			tag:            tag,
+			dependencies:   withDialerDependency(options.DialerOptions),
+			outboundServer: options.ServerOptions.Build(),
 		},
 		sHTTP.NewClient(sHTTP.Options{
 			Dialer:   detour,

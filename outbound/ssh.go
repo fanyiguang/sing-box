@@ -51,12 +51,13 @@ func NewSSH(ctx context.Context, router adapter.Router, logger log.ContextLogger
 	}
 	outbound := &SSH{
 		myOutboundAdapter: myOutboundAdapter{
-			protocol:     C.TypeSSH,
-			network:      []string{N.NetworkTCP},
-			router:       router,
-			logger:       logger,
-			tag:          tag,
-			dependencies: withDialerDependency(options.DialerOptions),
+			protocol:       C.TypeSSH,
+			network:        []string{N.NetworkTCP},
+			router:         router,
+			logger:         logger,
+			tag:            tag,
+			dependencies:   withDialerDependency(options.DialerOptions),
+			outboundServer: options.ServerOptions.Build(),
 		},
 		ctx:               ctx,
 		dialer:            outboundDialer,

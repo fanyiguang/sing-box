@@ -45,12 +45,13 @@ func NewShadowsocks(ctx context.Context, router adapter.Router, logger log.Conte
 	}
 	outbound := &Shadowsocks{
 		myOutboundAdapter: myOutboundAdapter{
-			protocol:     C.TypeShadowsocks,
-			network:      options.Network.Build(),
-			router:       router,
-			logger:       logger,
-			tag:          tag,
-			dependencies: withDialerDependency(options.DialerOptions),
+			protocol:       C.TypeShadowsocks,
+			network:        options.Network.Build(),
+			router:         router,
+			logger:         logger,
+			tag:            tag,
+			dependencies:   withDialerDependency(options.DialerOptions),
+			outboundServer: options.ServerOptions.Build(),
 		},
 		dialer:     outboundDialer,
 		method:     method,

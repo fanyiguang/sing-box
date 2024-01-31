@@ -258,15 +258,17 @@ func castMetadata(metadata adapter.InboundContext) trafficontrol.Metadata {
 		}
 	}
 	return trafficontrol.Metadata{
-		NetWork:     metadata.Network,
-		Type:        inbound,
-		SrcIP:       metadata.Source.Addr,
-		DstIP:       metadata.Destination.Addr,
-		SrcPort:     F.ToString(metadata.Source.Port),
-		DstPort:     F.ToString(metadata.Destination.Port),
-		Host:        domain,
-		DNSMode:     "normal",
-		ProcessPath: processPath,
+		NetWork:        metadata.Network,
+		Type:           inbound,
+		SrcIP:          metadata.Source.Addr,
+		DstIP:          metadata.Destination.Addr,
+		SrcPort:        F.ToString(metadata.Source.Port),
+		DstPort:        F.ToString(metadata.Destination.Port),
+		Host:           domain,
+		DNSMode:        "normal",
+		ProcessPath:    processPath,
+		OutboundServer: metadata.OutboundServer,
+		Extend:         metadata.Extend,
 	}
 }
 

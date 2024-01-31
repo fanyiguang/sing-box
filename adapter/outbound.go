@@ -13,6 +13,7 @@ type Outbound interface {
 	Type() string
 	Tag() string
 	Network() []string
+	Server() string
 	Dependencies() []string
 	N.Dialer
 	NewConnection(ctx context.Context, conn net.Conn, metadata InboundContext) error

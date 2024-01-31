@@ -25,16 +25,17 @@ type InjectableInbound interface {
 }
 
 type InboundContext struct {
-	Inbound     string
-	InboundType string
-	IPVersion   uint8
-	Network     string
-	Source      M.Socksaddr
-	Destination M.Socksaddr
-	Domain      string
-	Protocol    string
-	User        string
-	Outbound    string
+	Inbound        string
+	InboundType    string
+	IPVersion      uint8
+	Network        string
+	Source         M.Socksaddr
+	Destination    M.Socksaddr
+	Domain         string
+	Protocol       string
+	User           string
+	Outbound       string
+	OutboundServer string
 
 	// cache
 
@@ -56,6 +57,8 @@ type InboundContext struct {
 	SourcePortMatch         bool
 	DestinationAddressMatch bool
 	DestinationPortMatch    bool
+
+	Extend *option.Extend
 }
 
 func (c *InboundContext) ResetRuleCache() {

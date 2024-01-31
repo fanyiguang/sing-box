@@ -2,6 +2,8 @@ package log
 
 import (
 	"context"
+	"github.com/sagernet/sing-box/option"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
 	"time"
@@ -20,12 +22,14 @@ type defaultFactory struct {
 	platformFormatter Formatter
 	writer            io.Writer
 	file              *os.File
+	logger            *lumberjack.Logger
 	filePath          string
 	platformWriter    PlatformWriter
 	needObservable    bool
 	level             Level
 	subscriber        *observable.Subscriber[Entry]
 	observer          *observable.Observer[Entry]
+	rotate            option.Rotate
 }
 
 func NewDefaultFactory(
@@ -35,6 +39,7 @@ func NewDefaultFactory(
 	filePath string,
 	platformWriter PlatformWriter,
 	needObservable bool,
+	rotate option.Rotate,
 ) ObservableFactory {
 	factory := &defaultFactory{
 		ctx:       ctx,
@@ -49,6 +54,7 @@ func NewDefaultFactory(
 		needObservable: needObservable,
 		level:          LevelTrace,
 		subscriber:     observable.NewSubscriber[Entry](128),
+		rotate:         rotate,
 	}
 	if platformWriter != nil {
 		factory.platformFormatter.DisableColors = platformWriter.DisableColors()
@@ -59,17 +65,32 @@ func NewDefaultFactory(
 
 func (f *defaultFactory) Start() error {
 	if f.filePath != "" {
-		logFile, err := filemanager.OpenFile(f.ctx, f.filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-		if err != nil {
-			return err
+		if !f.rotate.Disabled {
+			logger := &lumberjack.Logger{
+				LocalTime:  true,
+				Filename:   f.filePath,
+				MaxSize:    f.rotate.MaxSize,
+				MaxBackups: f.rotate.MaxBackups,
+				MaxAge:     f.rotate.MaxAge,
+			}
+			f.writer = logger
+			f.logger = logger
+		} else {
+			logFile, err := filemanager.OpenFile(f.ctx, f.filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+			if err != nil {
+				return err
+			}
+			f.writer = logFile
+			f.file = logFile
 		}
-		f.writer = logFile
-		f.file = logFile
 	}
 	return nil
 }
 
 func (f *defaultFactory) Close() error {
+	if !f.rotate.Disabled {
+		return f.logger.Close()
+	}
 	return common.Close(
 		common.PtrOrNil(f.file),
 		f.observer,

@@ -16,6 +16,11 @@ PREFIX ?= $(shell go env GOPATH)
 
 .PHONY: test release docs
 
+build-server:
+	GOOS=linux GOARCH=386 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-x86 $(MAIN)
+	GOOS=linux GOARCH=arm go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-amd $(MAIN)
+	GOOS=windows go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-win.exe $(MAIN)
+
 build:
 	go build $(MAIN_PARAMS) $(MAIN)
 

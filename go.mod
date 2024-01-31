@@ -1,5 +1,7 @@
 module github.com/sagernet/sing-box
 
+replace github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240131100118-512262fb7393
+
 go 1.20
 
 require (
@@ -50,6 +52,7 @@ require (
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	howett.net/plist v1.0.1
 )
 

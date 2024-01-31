@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	mainLog "github.com/sagernet/sing-box/common/log"
 	"io"
 	"os"
 	"os/signal"
@@ -170,6 +171,7 @@ func run() error {
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 	defer signal.Stop(osSignals)
+	mainLog.Init("./log.log")
 	for {
 		instance, cancel, err := create()
 		if err != nil {

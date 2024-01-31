@@ -12,6 +12,9 @@ import (
 )
 
 func GenerateCertificate(timeFunc func() time.Time, serverName string) (*tls.Certificate, error) {
+	if timeFunc == nil {
+		timeFunc = time.Now
+	}
 	privateKeyPem, publicKeyPem, err := GenerateKeyPair(timeFunc, serverName, timeFunc().Add(time.Hour))
 	if err != nil {
 		return nil, err

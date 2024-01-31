@@ -22,12 +22,13 @@ import (
 )
 
 type myOutboundAdapter struct {
-	protocol     string
-	network      []string
-	router       adapter.Router
-	logger       log.ContextLogger
-	tag          string
-	dependencies []string
+	protocol       string
+	network        []string
+	router         adapter.Router
+	logger         log.ContextLogger
+	tag            string
+	dependencies   []string
+	outboundServer M.Socksaddr
 }
 
 func (a *myOutboundAdapter) Type() string {
@@ -36,6 +37,10 @@ func (a *myOutboundAdapter) Type() string {
 
 func (a *myOutboundAdapter) Tag() string {
 	return a.tag
+}
+
+func (a *myOutboundAdapter) Server() string {
+	return a.outboundServer.String()
 }
 
 func (a *myOutboundAdapter) Network() []string {

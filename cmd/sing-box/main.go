@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/sagernet/sing-box/option"
 	"os"
 	"os/user"
 	"strconv"
@@ -56,7 +57,7 @@ func preRun(cmd *cobra.Command, args []string) {
 		globalCtx = filemanager.WithDefault(globalCtx, "", "", sudoUID, sudoGID)
 	}
 	if disableColor {
-		log.SetStdLogger(log.NewDefaultFactory(context.Background(), log.Formatter{BaseTime: time.Now(), DisableColors: true}, os.Stderr, "", nil, false).Logger())
+		log.SetStdLogger(log.NewDefaultFactory(context.Background(), log.Formatter{BaseTime: time.Now(), DisableColors: true}, os.Stderr, "", nil, false, option.Rotate{}).Logger())
 	}
 	if workingDir != "" {
 		_, err := os.Stat(workingDir)

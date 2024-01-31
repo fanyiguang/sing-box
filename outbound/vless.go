@@ -42,12 +42,13 @@ func NewVLESS(ctx context.Context, router adapter.Router, logger log.ContextLogg
 	}
 	outbound := &VLESS{
 		myOutboundAdapter: myOutboundAdapter{
-			protocol:     C.TypeVLESS,
-			network:      options.Network.Build(),
-			router:       router,
-			logger:       logger,
-			tag:          tag,
-			dependencies: withDialerDependency(options.DialerOptions),
+			protocol:       C.TypeVLESS,
+			network:        options.Network.Build(),
+			router:         router,
+			logger:         logger,
+			tag:            tag,
+			dependencies:   withDialerDependency(options.DialerOptions),
+			outboundServer: options.ServerOptions.Build(),
 		},
 		dialer:     outboundDialer,
 		serverAddr: options.ServerOptions.Build(),

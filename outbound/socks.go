@@ -44,12 +44,13 @@ func NewSocks(router adapter.Router, logger log.ContextLogger, tag string, optio
 	}
 	outbound := &Socks{
 		myOutboundAdapter: myOutboundAdapter{
-			protocol:     C.TypeSOCKS,
-			network:      options.Network.Build(),
-			router:       router,
-			logger:       logger,
-			tag:          tag,
-			dependencies: withDialerDependency(options.DialerOptions),
+			protocol:       C.TypeSOCKS,
+			network:        options.Network.Build(),
+			router:         router,
+			logger:         logger,
+			tag:            tag,
+			dependencies:   withDialerDependency(options.DialerOptions),
+			outboundServer: options.ServerOptions.Build(),
 		},
 		client:  socks.NewClient(outboundDialer, options.ServerOptions.Build(), version, options.Username, options.Password),
 		resolve: version == socks.Version4,

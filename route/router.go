@@ -828,6 +828,9 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 	if !common.Contains(detour.Network(), N.NetworkTCP) {
 		return E.New("missing supported outbound, closing connection")
 	}
+	metadata.OutboundServer = detour.Server()
+	metadata.Extend = new(option.Extend)
+	ctx = context.WithValue(ctx, "used-address", &metadata.Extend.DstInfo)
 	if r.clashServer != nil {
 		trackerConn, tracker := r.clashServer.RoutedConnection(ctx, conn, metadata, matchedRule)
 		defer tracker.Leave()
@@ -838,7 +841,11 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 			conn = statsService.RoutedConnection(metadata.Inbound, detour.Tag(), metadata.User, conn)
 		}
 	}
-	return detour.NewConnection(ctx, conn, metadata)
+	err = detour.NewConnection(ctx, conn, metadata)
+	if err != nil {
+		metadata.Extend.ErrMsg = err.Error()
+	}
+	return err
 }
 
 func (r *Router) RoutePacketConnection(ctx context.Context, conn N.PacketConn, metadata adapter.InboundContext) error {

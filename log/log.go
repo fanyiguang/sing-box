@@ -56,6 +56,7 @@ func New(options Options) (Factory, error) {
 		logFilePath,
 		options.PlatformWriter,
 		options.Observable,
+		logOptions.Rotate,
 	)
 	if logOptions.Level != "" {
 		logLevel, err := ParseLevel(logOptions.Level)
