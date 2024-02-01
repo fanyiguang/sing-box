@@ -68,6 +68,7 @@ func newShadowsocksMulti(ctx context.Context, router adapter.Router, logger log.
 			int64(udpTimeout.Seconds()),
 			adapter.NewUpstreamContextHandler(inbound.newConnection, inbound.newPacketConnection, inbound),
 			ntp.TimeFuncFromContext(ctx),
+			options.Tolerance,
 		)
 	} else if common.Contains(shadowaead.List, options.Method) {
 		service, err = shadowaead.NewMultiService[int](

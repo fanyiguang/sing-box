@@ -1,6 +1,9 @@
 module github.com/sagernet/sing-box
 
-replace github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240131100118-512262fb7393
+replace (
+	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240131100118-512262fb7393
+	github.com/sagernet/sing-shadowsocks v0.2.6 => github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119
+)
 
 go 1.20
 
