@@ -243,12 +243,12 @@ func parseOutboundSSH(url *url.URL, index int, detourName string) (option.Outbou
 		c.SSHOptions.User = auth.Username
 		c.SSHOptions.Password = auth.Password
 	}
+
 	return c, nil
 }
 
 func parseOutboundSS(url *url.URL, index int, detourName string) (option.Outbound, error) {
 	auth := GetAuthInfoFromUrl(url)
-
 	addr, port, err := GetHostAndPortFromUrl(url)
 	if err != nil {
 		return option.Outbound{}, err
@@ -270,6 +270,13 @@ func parseOutboundSS(url *url.URL, index int, detourName string) (option.Outboun
 	if auth != nil {
 		c.ShadowsocksOptions.Method = auth.Username
 		c.ShadowsocksOptions.Password = auth.Password
+	}
+	tolerance, err := strconv.Atoi(url.Query().Get("tolerance"))
+	if err != nil {
+		return option.Outbound{}, err
+	}
+	if tolerance > 0 {
+		c.ShadowsocksOptions.Tolerance = tolerance
 	}
 	return c, nil
 }

@@ -7,6 +7,7 @@ type ShadowsocksInboundOptions struct {
 	Password     string                   `json:"password"`
 	Users        []ShadowsocksUser        `json:"users,omitempty"`
 	Destinations []ShadowsocksDestination `json:"destinations,omitempty"`
+	Tolerance    int                      `json:"tolerance,omitempty"`
 }
 
 type ShadowsocksUser struct {
@@ -30,4 +31,5 @@ type ShadowsocksOutboundOptions struct {
 	Network           NetworkList        `json:"network,omitempty"`
 	UDPOverTCPOptions *UDPOverTCPOptions `json:"udp_over_tcp,omitempty"`
 	MultiplexOptions  *MultiplexOptions  `json:"multiplex,omitempty"`
+	Tolerance         int                `json:"tolerance,omitempty"`
 }

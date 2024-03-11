@@ -58,6 +58,7 @@ func newShadowsocksMulti(ctx context.Context, router adapter.Router, logger log.
 		udpTimeout,
 		adapter.NewUpstreamContextHandler(inbound.newConnection, inbound.newPacketConnection, inbound),
 		router.TimeFunc(),
+		options.Tolerance,
 	)
 	if err != nil {
 		return nil, err
