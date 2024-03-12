@@ -271,12 +271,15 @@ func parseOutboundSS(url *url.URL, index int, detourName string) (option.Outboun
 		c.ShadowsocksOptions.Method = auth.Username
 		c.ShadowsocksOptions.Password = auth.Password
 	}
-	tolerance, err := strconv.Atoi(url.Query().Get("tolerance"))
-	if err != nil {
-		return option.Outbound{}, err
-	}
-	if tolerance > 0 {
-		c.ShadowsocksOptions.Tolerance = tolerance
+	t := url.Query().Get("tolerance")
+	if t != "" {
+		tolerance, err := strconv.Atoi(t)
+		if err != nil {
+			return option.Outbound{}, err
+		}
+		if tolerance > 0 {
+			c.ShadowsocksOptions.Tolerance = tolerance
+		}
 	}
 	return c, nil
 }
