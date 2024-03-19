@@ -40,6 +40,9 @@ type tracker interface {
 
 var printLog = func(ti *trackerInfo) {
 	domain := ti.Metadata.Host
+	if ti.Metadata.Extend == nil {
+		ti.Metadata.Extend = new(option.Extend)
+	}
 	if domain == "" {
 		//domain = net.JoinHostPort(ti.Metadata.DstIP.String(), ti.Metadata.DstPort)
 		if ti.Metadata.Extend.DstInfo == "" {

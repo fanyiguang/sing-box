@@ -955,6 +955,9 @@ func (r *Router) RoutePacketConnection(ctx context.Context, conn N.PacketConn, m
 	if !common.Contains(detour.Network(), N.NetworkUDP) {
 		return E.New("missing supported outbound, closing packet connection")
 	}
+	metadata.OutboundServer = detour.Server()
+	metadata.Extend = new(option.Extend)
+	ctx = context.WithValue(ctx, "used-address", &metadata.Extend.DstInfo)
 	if r.clashServer != nil {
 		trackerConn, tracker := r.clashServer.RoutedPacketConnection(ctx, conn, metadata, matchedRule)
 		defer tracker.Leave()
@@ -968,7 +971,11 @@ func (r *Router) RoutePacketConnection(ctx context.Context, conn N.PacketConn, m
 	if metadata.FakeIP {
 		conn = bufio.NewNATPacketConn(bufio.NewNetPacketConn(conn), metadata.OriginDestination, metadata.Destination)
 	}
-	return detour.NewPacketConnection(ctx, conn, metadata)
+	err = detour.NewPacketConnection(ctx, conn, metadata)
+	if err != nil {
+		metadata.Extend.ErrMsg = err.Error()
+	}
+	return err
 }
 
 func (r *Router) match(ctx context.Context, metadata *adapter.InboundContext, defaultOutbound adapter.Outbound) (context.Context, adapter.Rule, adapter.Outbound, error) {

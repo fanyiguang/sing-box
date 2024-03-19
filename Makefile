@@ -18,7 +18,8 @@ PREFIX ?= $(shell go env GOPATH)
 
 build-server:
 	GOOS=linux GOARCH=386 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-x86 $(MAIN)
-	GOOS=linux GOARCH=arm go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-amd $(MAIN)
+	GOOS=linux GOARCH=amd64 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-amd64 $(MAIN)
+	GOOS=linux GOARCH=arm go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-arm $(MAIN)
 	GOOS=windows go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-win.exe $(MAIN)
 
 build:
