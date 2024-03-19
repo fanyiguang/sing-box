@@ -3,6 +3,7 @@ module github.com/sagernet/sing-box
 replace (
 	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240131100118-512262fb7393
 	github.com/sagernet/sing-shadowsocks v0.2.6 => github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119
+	github.com/sagernet/sing-shadowsocks2 v0.2.0 => github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac
 )
 
 go 1.20

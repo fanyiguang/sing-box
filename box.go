@@ -39,6 +39,7 @@ type Box struct {
 	preServices2 map[string]adapter.Service
 	postServices map[string]adapter.Service
 	done         chan struct{}
+	ctx          context.Context
 }
 
 type Options struct {
@@ -193,6 +194,7 @@ func New(options Options) (*Box, error) {
 		preServices2: preServices2,
 		postServices: postServices,
 		done:         make(chan struct{}),
+		ctx:          ctx,
 	}, nil
 }
 

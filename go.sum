@@ -19,6 +19,8 @@ github.com/fanyiguang/sing v0.2.5-0.20240131100118-512262fb7393 h1:yDIQ6YnwNlrY6
 github.com/fanyiguang/sing v0.2.5-0.20240131100118-512262fb7393/go.mod h1:9pfuAH6mZfgnz/YjP6xu5sxx882rfyjpcrTdUpd6w3g=
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119 h1:MZ7jRmpDgMzZJYllaWowrSUaZ0bIqzXrDjn6BsJdyEk=
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119/go.mod h1:j2YZBIpWIuElPFL/5sJAj470bcn/3QQ5lxZUNKLDNAM=
+github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac h1:PEW5UkXvd96kJ8UAxnHk9PZ9sGgii1a01h5mirH+g0w=
+github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac/go.mod h1:RnXS0lExcDAovvDeniJ4IKa2IuChrdipolPYWBv9hWQ=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
 github.com/gaukas/godicttls v0.0.4 h1:NlRaXb3J6hAnTmWdsEKb9bcSBD6BvcIjdGdeb0zfXbk=
@@ -118,8 +120,6 @@ github.com/sagernet/sing-mux v0.2.0 h1:4C+vd8HztJCWNYfufvgL49xaOoOHXty2+EAjnzN3I
 github.com/sagernet/sing-mux v0.2.0/go.mod h1:khzr9AOPocLa+g53dBplwNDz4gdsyx/YM3swtAhlkHQ=
 github.com/sagernet/sing-quic v0.1.7 h1:SC45rAnvQ9BuyO0V186OdDScMBitmZo0XcM9LBYRUW8=
 github.com/sagernet/sing-quic v0.1.7/go.mod h1:wUg1Z6AGKeJguruZo0lhrie3dqPiRCKaidLAbK2ttEs=
-github.com/sagernet/sing-shadowsocks2 v0.2.0 h1:wpZNs6wKnR7mh1wV9OHwOyUr21VkS3wKFHi+8XwgADg=
-github.com/sagernet/sing-shadowsocks2 v0.2.0/go.mod h1:RnXS0lExcDAovvDeniJ4IKa2IuChrdipolPYWBv9hWQ=
 github.com/sagernet/sing-shadowtls v0.1.4 h1:aTgBSJEgnumzFenPvc+kbD9/W0PywzWevnVpEx6Tw3k=
 github.com/sagernet/sing-shadowtls v0.1.4/go.mod h1:F8NBgsY5YN2beQavdgdm1DPlhaKQlaL6lpDdcBglGK4=
 github.com/sagernet/sing-tun v0.2.0 h1:/WloeRTWvwKIuiIvY+HVJaaZsTGb3XqJXZUbn6wVhz4=

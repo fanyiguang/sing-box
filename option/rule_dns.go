@@ -97,6 +97,7 @@ type DefaultDNSRule struct {
 	Server            string                 `json:"server,omitempty"`
 	DisableCache      bool                   `json:"disable_cache,omitempty"`
 	RewriteTTL        *uint32                `json:"rewrite_ttl,omitempty"`
+	Tag               string                 `json:"tag,omitempty"`
 }
 
 func (r DefaultDNSRule) IsValid() bool {
@@ -115,6 +116,7 @@ type LogicalDNSRule struct {
 	Server       string    `json:"server,omitempty"`
 	DisableCache bool      `json:"disable_cache,omitempty"`
 	RewriteTTL   *uint32   `json:"rewrite_ttl,omitempty"`
+	Tag          string    `json:"tag,omitempty"`
 }
 
 func (r LogicalDNSRule) IsValid() bool {

@@ -20,10 +20,15 @@ type abstractDefaultRule struct {
 	ruleSetItem             RuleItem
 	invert                  bool
 	outbound                string
+	tag                     string
 }
 
 func (r *abstractDefaultRule) Type() string {
 	return C.RuleTypeDefault
+}
+
+func (r *abstractDefaultRule) Tag() string {
+	return r.tag
 }
 
 func (r *abstractDefaultRule) Start() error {
@@ -141,10 +146,15 @@ type abstractLogicalRule struct {
 	mode     string
 	invert   bool
 	outbound string
+	tag      string
 }
 
 func (r *abstractLogicalRule) Type() string {
 	return C.RuleTypeLogical
+}
+
+func (r *abstractLogicalRule) Tag() string {
+	return r.tag
 }
 
 func (r *abstractLogicalRule) UpdateGeosite() error {

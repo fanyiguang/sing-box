@@ -153,6 +153,7 @@ type DefaultHeadlessRule struct {
 	WIFISSID        Listable[string]       `json:"wifi_ssid,omitempty"`
 	WIFIBSSID       Listable[string]       `json:"wifi_bssid,omitempty"`
 	Invert          bool                   `json:"invert,omitempty"`
+	Tag             string                 `json:"tag,omitempty"`
 
 	DomainMatcher *domain.Matcher `json:"-"`
 	SourceIPSet   *netipx.IPSet   `json:"-"`
@@ -169,6 +170,7 @@ type LogicalHeadlessRule struct {
 	Mode   string         `json:"mode"`
 	Rules  []HeadlessRule `json:"rules,omitempty"`
 	Invert bool           `json:"invert,omitempty"`
+	Tag    string         `json:"tag,omitempty"`
 }
 
 func (r LogicalHeadlessRule) IsValid() bool {

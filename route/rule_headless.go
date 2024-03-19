@@ -34,6 +34,7 @@ func NewDefaultHeadlessRule(router adapter.Router, options option.DefaultHeadles
 	rule := &DefaultHeadlessRule{
 		abstractDefaultRule{
 			invert: options.Invert,
+			tag:    options.Tag,
 		},
 	}
 	if len(options.Network) > 0 {
@@ -152,6 +153,7 @@ func NewLogicalHeadlessRule(router adapter.Router, options option.LogicalHeadles
 		abstractLogicalRule{
 			rules:  make([]adapter.HeadlessRule, len(options.Rules)),
 			invert: options.Invert,
+			tag:    options.Tag,
 		},
 	}
 	switch options.Mode {

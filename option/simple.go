@@ -23,6 +23,7 @@ type SocksOutboundOptions struct {
 	Password   string             `json:"password,omitempty"`
 	Network    NetworkList        `json:"network,omitempty"`
 	UDPOverTCP *UDPOverTCPOptions `json:"udp_over_tcp,omitempty"`
+	OutboundTLSOptionsContainer
 }
 
 type HTTPOutboundOptions struct {
@@ -31,6 +32,7 @@ type HTTPOutboundOptions struct {
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 	OutboundTLSOptionsContainer
-	Path    string     `json:"path,omitempty"`
-	Headers HTTPHeader `json:"headers,omitempty"`
+	Path           string     `json:"path,omitempty"`
+	Headers        HTTPHeader `json:"headers,omitempty"`
+	EnableAutoMode bool       `json:"auto_mode,omitempty"`
 }

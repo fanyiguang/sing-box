@@ -3,12 +3,14 @@ package route
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"net/netip"
 	"net/url"
 	"os"
 	"os/user"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -53,9 +55,12 @@ type Router struct {
 	logger                             log.ContextLogger
 	dnsLogger                          log.ContextLogger
 	inboundByTag                       map[string]adapter.Inbound
+	inboundMt                          sync.RWMutex
 	outbounds                          []adapter.Outbound
 	outboundByTag                      map[string]adapter.Outbound
+	outboundMt                         sync.RWMutex
 	rules                              []adapter.Rule
+	ruleMt                             sync.RWMutex
 	defaultDetour                      string
 	defaultOutboundForConnection       adapter.Outbound
 	defaultOutboundForPacketConnection adapter.Outbound
@@ -686,6 +691,8 @@ func (r *Router) PostStart() error {
 }
 
 func (r *Router) Outbound(tag string) (adapter.Outbound, bool) {
+	r.outboundMt.RLock()
+	defer r.outboundMt.RUnlock()
 	outbound, loaded := r.outboundByTag[tag]
 	return outbound, loaded
 }
@@ -1093,6 +1100,8 @@ func (r *Router) DefaultMark() int {
 }
 
 func (r *Router) Rules() []adapter.Rule {
+	r.ruleMt.RLock()
+	defer r.ruleMt.RUnlock()
 	return r.rules
 }
 
@@ -1192,4 +1201,139 @@ func (r *Router) updateWIFIState() {
 		r.wifiState = state
 		r.logger.Info("updated WIFI state: SSID=", state.SSID, ", BSSID=", state.BSSID)
 	}
+}
+
+func (r *Router) Inbound() map[string]adapter.Inbound {
+	r.inboundMt.RLock()
+	defer r.inboundMt.RUnlock()
+	return r.inboundByTag
+}
+
+func (r *Router) AddInbound(inbound adapter.Inbound, replace bool) error {
+	r.inboundMt.Lock()
+	defer r.inboundMt.Unlock()
+	err := common.Start(inbound)
+	if err != nil {
+		return err
+	}
+	if in, ok := r.inboundByTag[inbound.Tag()]; ok {
+		if replace {
+			err := in.Close()
+			if err != nil {
+				return err
+			}
+		} else {
+			return E.New("inbound[", inbound.Tag(), "] already")
+		}
+	}
+	r.inboundByTag[inbound.Tag()] = inbound
+	return nil
+}
+
+func (r *Router) DelInbound(tag string) {
+	r.inboundMt.Lock()
+	defer r.inboundMt.Unlock()
+	if inbound, ok := r.inboundByTag[tag]; ok {
+		_ = common.Close(inbound)
+		delete(r.inboundByTag, tag)
+	}
+}
+
+func (r *Router) AddOutbounds(outbounds []adapter.Outbound, replace bool) error {
+	err := r.addOutbounds(outbounds, replace)
+	if err != nil {
+		return err
+	}
+
+	for _, out := range outbounds {
+		err := common.Start(out)
+		if err != nil {
+			r.logger.Error("start outbound error:", err)
+		}
+	}
+	return nil
+}
+
+func (r *Router) addOutbounds(outbounds []adapter.Outbound, replace bool) error {
+	r.outboundMt.Lock()
+	defer r.outboundMt.Unlock()
+	if !replace {
+		for _, out := range outbounds {
+			if _, ok := r.outboundByTag[out.Tag()]; ok {
+				return fmt.Errorf("outbound %q allready exists", out.Tag())
+			}
+		}
+	}
+
+	// clean r.outbounds
+	r.outbounds = common.Filter(r.outbounds, func(it adapter.Outbound) bool {
+		for _, outbound := range outbounds {
+			if it.Tag() == outbound.Tag() {
+				common.Close(it)
+				return false
+			}
+		}
+		return true
+	})
+
+	for _, out := range outbounds {
+		r.outbounds = append(r.outbounds, out)
+		r.outboundByTag[out.Tag()] = out
+	}
+	return nil
+}
+
+func (r *Router) DelOutbound(tag string) {
+	if len(tag) == 0 {
+		return
+	}
+
+	r.outboundMt.Lock()
+	defer r.outboundMt.Unlock()
+	for _tag, out := range r.outboundByTag {
+		if _tag == tag {
+			delete(r.outboundByTag, tag)
+			_ = common.Close(out)
+			r.outbounds = common.Filter(r.outbounds, func(r adapter.Outbound) bool {
+				if r.Tag() == tag {
+					return false
+				}
+				return true
+			})
+			break
+		}
+	}
+}
+
+func (r *Router) AddRules(rule []adapter.Rule) {
+	r.ruleMt.Lock()
+	defer r.ruleMt.Unlock()
+	r.rules = append(r.rules, rule...)
+}
+
+func (r *Router) UpdateRule(tag string, rule adapter.Rule) {
+	r.ruleMt.Lock()
+	defer r.ruleMt.Unlock()
+	r.rules = common.Filter(r.rules, func(r adapter.Rule) bool {
+		if r.Tag() == tag {
+			return false
+		}
+		return true
+	})
+	r.rules = append(r.rules, rule)
+}
+
+func (r *Router) DelRules(tag string) {
+	if len(tag) == 0 {
+		return
+	}
+
+	r.ruleMt.Lock()
+	defer r.ruleMt.Unlock()
+	r.rules = common.Filter(r.rules, func(r adapter.Rule) bool {
+		if r.Tag() == tag {
+			return false
+		}
+		return true
+	})
 }

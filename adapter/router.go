@@ -20,8 +20,13 @@ type Router interface {
 	PreStarter
 	PostStarter
 
+	AddInbound(inbound Inbound, replace bool) error
+	DelInbound(string)
+
 	Outbounds() []Outbound
 	Outbound(tag string) (Outbound, bool)
+	AddOutbounds([]Outbound, bool) error
+	DelOutbound(tag string)
 	DefaultOutbound(network string) (Outbound, error)
 
 	FakeIPStore() FakeIPStore
@@ -32,6 +37,9 @@ type Router interface {
 	LoadGeosite(code string) (Rule, error)
 
 	RuleSet(tag string) (RuleSet, bool)
+	AddRules(rule []Rule)
+	UpdateRule(tag string, rule Rule)
+	DelRules(tag string)
 
 	Exchange(ctx context.Context, message *mdns.Msg) (*mdns.Msg, error)
 	Lookup(ctx context.Context, domain string, strategy dns.DomainStrategy) ([]netip.Addr, error)
@@ -74,6 +82,7 @@ type HeadlessRule interface {
 type Rule interface {
 	HeadlessRule
 	Service
+	Tag() string
 	Type() string
 	UpdateGeosite() error
 	Outbound() string

@@ -21,6 +21,12 @@ import (
 	N "github.com/sagernet/sing/common/network"
 )
 
+type contextKey string
+
+const (
+	CtxDialFinishChannelKey contextKey = "DialFinish"
+)
+
 type myOutboundAdapter struct {
 	protocol       string
 	network        []string
@@ -246,4 +252,25 @@ func NewError(logger log.ContextLogger, ctx context.Context, err error) {
 		return
 	}
 	logger.ErrorContext(ctx, err)
+}
+
+func checkContext(ctx context.Context) error {
+	// 给外部发送 Dial 成功信号，通过 CtxDialFinishChannelKey 判断是否需要发送
+
+	value := ctx.Value(CtxDialFinishChannelKey)
+	if dialFinishChan, ok := value.(chan chan struct{}); ok {
+		continueSingle := make(chan struct{})
+
+		dialFinishChan <- continueSingle
+		close(dialFinishChan)
+
+		select {
+		// 外部可能已经超时，不会关闭cc
+		case <-time.After(time.Second):
+			return E.New("context is canceled")
+		case <-continueSingle:
+		}
+	}
+
+	return nil
 }
