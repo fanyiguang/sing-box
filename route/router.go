@@ -815,12 +815,15 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 		}
 	}
 
+	destination := metadata.Destination
 	if metadata.Destination.IsFqdn() && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
 		if err != nil {
 			return err
 		}
 		metadata.DestinationAddresses = addresses
+		r.dnsLogger.InfoContext(ctx, fmt.Sprintf("tcp port_1: %v, port_2: %v", destination.String(), metadata.Destination.String()))
+		metadata.Destination = destination
 		r.dnsLogger.DebugContext(ctx, "resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
 	}
 	if metadata.Destination.IsIPv4() {
@@ -942,12 +945,15 @@ func (r *Router) RoutePacketConnection(ctx context.Context, conn N.PacketConn, m
 			r.logger.DebugContext(ctx, "found reserve mapped domain: ", metadata.Domain)
 		}
 	}
+	destination := metadata.Destination
 	if metadata.Destination.IsFqdn() && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
 		if err != nil {
 			return err
 		}
 		metadata.DestinationAddresses = addresses
+		r.dnsLogger.InfoContext(ctx, fmt.Sprintf("udp port_1: %v, port_2: %v", destination.String(), metadata.Destination.String()))
+		metadata.Destination = destination
 		r.dnsLogger.DebugContext(ctx, "resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
 	}
 	if metadata.Destination.IsIPv4() {

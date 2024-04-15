@@ -2,6 +2,7 @@ package inbound
 
 import (
 	"context"
+	"encoding/json"
 	"net"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -69,7 +70,8 @@ func (a *myInboundAdapter) injectTCP(conn net.Conn, metadata adapter.InboundCont
 	hErr := a.connHandler.NewConnection(ctx, conn, metadata)
 	if hErr != nil {
 		conn.Close()
-		a.NewError(ctx, E.Cause(hErr, "process connection from ", metadata.Source))
+		jsonMetadata, _ := json.Marshal(metadata)
+		a.NewError(ctx, E.Cause(hErr, "process connection from ", metadata.Source, " json metadata ", string(jsonMetadata)))
 	}
 }
 
@@ -78,6 +80,7 @@ func (a *myInboundAdapter) routeTCP(ctx context.Context, conn net.Conn, metadata
 	hErr := a.newConnection(ctx, conn, metadata)
 	if hErr != nil {
 		conn.Close()
-		a.NewError(ctx, E.Cause(hErr, "process connection from ", metadata.Source))
+		jsonMetadata, _ := json.Marshal(metadata)
+		a.NewError(ctx, E.Cause(hErr, "process connection from ", metadata.Source, " json metadata ", string(jsonMetadata)))
 	}
 }
