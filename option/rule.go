@@ -53,6 +53,17 @@ func (r *Rule) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
+func (r Rule) Tag() string {
+	switch r.Type {
+	case C.RuleTypeDefault:
+		return r.DefaultOptions.Tag
+	case C.RuleTypeLogical:
+		return r.LogicalOptions.Tag
+	default:
+		return ""
+	}
+}
+
 func (r Rule) IsValid() bool {
 	switch r.Type {
 	case C.RuleTypeDefault:

@@ -59,6 +59,10 @@ func New(ctx context.Context, router adapter.Router, logger log.ContextLogger, t
 		return NewSelector(ctx, router, logger, tag, options.SelectorOptions)
 	case C.TypeURLTest:
 		return NewURLTest(ctx, router, logger, tag, options.URLTestOptions)
+	case C.PacEngineSystem:
+		return NewSystem(ctx, router, logger, tag, options.SystemOptions)
+	case C.TypeDynamicURLTest:
+		return NewDynamicURLTest(ctx, router, logger, tag, options.DynamicURLTestOptions)
 	default:
 		return nil, E.New("unknown outbound type: ", options.Type)
 	}

@@ -98,3 +98,11 @@ func (s *Box) DelRule(tag string) {
 	s.logger.Info("delete rule: ", tag)
 	s.router.DelRules(tag)
 }
+
+func (s *Box) AddDNSServer(servers []option.DNSServerOptions) error {
+	return s.router.AddDNSServer(servers)
+}
+
+func (s *Box) DelDNSServer(tag string) bool {
+	return s.router.DelDNSServer(tag)
+}

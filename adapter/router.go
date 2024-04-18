@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"context"
+	"github.com/sagernet/sing-box/option"
 	"net/http"
 	"net/netip"
 
@@ -57,6 +58,9 @@ type Router interface {
 	PackageManager() tun.PackageManager
 	WIFIState() WIFIState
 	Rules() []Rule
+
+	AddDNSServer(servers []option.DNSServerOptions) error
+	DelDNSServer(tag string) bool
 
 	ClashServer() ClashServer
 	SetClashServer(server ClashServer)

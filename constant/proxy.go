@@ -23,11 +23,13 @@ const (
 	TypeVLESS        = "vless"
 	TypeTUIC         = "tuic"
 	TypeHysteria2    = "hysteria2"
+	TypeSystem       = "system"
 )
 
 const (
-	TypeSelector = "selector"
-	TypeURLTest  = "urltest"
+	TypeSelector       = "selector"
+	TypeURLTest        = "urltest"
+	TypeDynamicURLTest = "dynamicurltest"
 )
 
 func ProxyDisplayName(proxyType string) string {
@@ -72,6 +74,10 @@ func ProxyDisplayName(proxyType string) string {
 		return "Selector"
 	case TypeURLTest:
 		return "URLTest"
+	case TypeDynamicURLTest:
+		return "DynamicURLTest"
+	case TypeSystem:
+		return "System"
 	default:
 		return "Unknown"
 	}

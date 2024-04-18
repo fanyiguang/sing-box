@@ -143,6 +143,12 @@ func (r *Router) Lookup(ctx context.Context, domain string, strategy dns.DomainS
 	return addrs, err
 }
 
+func (r *Router) getTransportMap() map[string]dns.Transport {
+	r.transportMt.RLock()
+	defer r.transportMt.RUnlock()
+	return r.transportMap
+}
+
 func (r *Router) LookupDefault(ctx context.Context, domain string) ([]netip.Addr, error) {
 	return r.Lookup(ctx, domain, dns.DomainStrategyAsIS)
 }
