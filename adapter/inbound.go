@@ -47,6 +47,7 @@ type InboundContext struct {
 	SourceGeoIPCode      string
 	GeoIPCode            string
 	ProcessInfo          *process.Info
+	ProcessParentIds     []int32
 	QueryType            uint16
 	FakeIP               bool
 
