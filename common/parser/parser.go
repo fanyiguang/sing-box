@@ -176,9 +176,29 @@ func GetOutboundFromURL(url *url.URL, index int, detourName string) (option.Outb
 		return parseOutboundSSH(url, index, detourName)
 	case "ss", "shadowsocks":
 		return parseOutboundSS(url, index, detourName)
+	case constant.TypeSystem:
+		return parseOutboundSystem(url, index, detourName)
 	default:
 		return option.Outbound{}, exceptions.New("unknown outbound type ", url.Scheme)
 	}
+}
+
+func parseOutboundSystem(url *url.URL, index int, detourName string) (option.Outbound, error) {
+	c := option.Outbound{
+		Type: constant.TypeSystem,
+		Tag:  "jump-" + strconv.Itoa(index),
+	}
+	t := url.Query().Get("reload_interval")
+	if t != "" {
+		reloadInterval, err := strconv.Atoi(t)
+		if err != nil {
+			return option.Outbound{}, err
+		}
+		if reloadInterval > 0 {
+			c.SystemOptions.ReloadInterval = reloadInterval
+		}
+	}
+	return c, nil
 }
 
 func parseOutboundSocks(url *url.URL, index int, detourName string, enableTLS bool) (option.Outbound, error) {
@@ -270,6 +290,16 @@ func parseOutboundSS(url *url.URL, index int, detourName string) (option.Outboun
 	if auth != nil {
 		c.ShadowsocksOptions.Method = auth.Username
 		c.ShadowsocksOptions.Password = auth.Password
+	}
+	t := url.Query().Get("tolerance")
+	if t != "" {
+		tolerance, err := strconv.Atoi(t)
+		if err != nil {
+			return option.Outbound{}, err
+		}
+		if tolerance > 0 {
+			c.ShadowsocksOptions.Tolerance = tolerance
+		}
 	}
 	return c, nil
 }
