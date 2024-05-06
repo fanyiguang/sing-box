@@ -80,6 +80,16 @@ func GetHostAndPortFromUrl(url *url.URL) (netip.Addr, uint16, error) {
 		return netip.Addr{}, 0, exceptions.New(p, "is not in range [1-65535]")
 	}
 
+	if net.ParseIP(host) == nil {
+		addresses, err := net.LookupHost(host)
+		if err != nil {
+			return netip.Addr{}, 0, err
+		}
+		if len(addresses) > 0 {
+			host = addresses[0]
+		}
+	}
+
 	addr, err := netip.ParseAddr(host)
 	if err != nil {
 		return netip.Addr{}, 0, exceptions.New("error ip addr: ", host)
