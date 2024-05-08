@@ -1,9 +1,10 @@
 module github.com/sagernet/sing-box
 
 replace (
-	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240131100118-512262fb7393
+	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240508102609-22c9b80c69b3
 	github.com/sagernet/sing-shadowsocks v0.2.6 => github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119
 	github.com/sagernet/sing-shadowsocks2 v0.2.0 => github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac
+	github.com/sagernet/sing-tun => github.com/sagernet/sing-tun v0.1.16
 )
 
 go 1.20
@@ -13,6 +14,7 @@ require (
 	github.com/caddyserver/certmagic v0.20.0
 	github.com/cloudflare/circl v1.3.7
 	github.com/cretz/bine v0.2.0
+	github.com/darren/gpac v0.0.0-20210609082804-b56d6523a3af
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/go-chi/cors v1.2.1
@@ -22,6 +24,7 @@ require (
 	github.com/libdns/alidns v1.0.3
 	github.com/libdns/cloudflare v0.1.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
+	github.com/mattn/go-ieproxy v0.0.11
 	github.com/mholt/acmez v1.2.0
 	github.com/miekg/dns v1.1.57
 	github.com/ooni/go-libtor v1.1.8
@@ -46,12 +49,14 @@ require (
 	github.com/sagernet/utls v1.5.4
 	github.com/sagernet/wireguard-go v0.0.0-20231215174105-89dec3b2f3e8
 	github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854
+	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
 	golang.org/x/crypto v0.18.0
 	golang.org/x/net v0.20.0
+	golang.org/x/sync v0.5.0
 	golang.org/x/sys v0.16.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.60.1
@@ -65,7 +70,6 @@ require (
 require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
-	github.com/darren/gpac v0.0.0-20210609082804-b56d6523a3af // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
 	github.com/dop251/goja v0.0.0-20210427212725-462d53687b0d // indirect
@@ -84,16 +88,14 @@ require (
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/libdns/libdns v0.2.1 // indirect
-	github.com/mattn/go-ieproxy v0.0.11 // indirect
-	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/onsi/ginkgo/v2 v2.9.7 // indirect
 	github.com/pierrec/lz4/v4 v4.1.14 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
 	github.com/quic-go/qtls-go1-20 v0.4.1 // indirect
+	github.com/sagernet/go-tun2socks v1.16.12-0.20220818015926-16cb67876a61 // indirect
 	github.com/sagernet/netlink v0.0.0-20220905062125-8043b4a9aa97 // indirect
 	github.com/scjalliance/comshim v0.0.0-20230315213746-5e51f40bd3b9 // indirect
-	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tklauser/go-sysconf v0.3.13 // indirect
 	github.com/tklauser/numcpus v0.7.0 // indirect
@@ -108,7 +110,6 @@ require (
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231002182017-d307bd883b97 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 )

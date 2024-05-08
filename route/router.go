@@ -1088,7 +1088,7 @@ func (r *Router) AutoDetectInterfaceFunc() control.Func {
 		return control.BindToInterfaceFunc(r.InterfaceFinder(), func(network string, address string) (interfaceName string, interfaceIndex int, err error) {
 			remoteAddr := M.ParseSocksaddr(address).Addr
 			if C.IsLinux {
-				interfaceName, interfaceIndex = r.InterfaceMonitor().DefaultInterface(remoteAddr)
+				interfaceName, interfaceIndex = r.InterfaceMonitor().DefaultInterfaceName(remoteAddr), r.InterfaceMonitor().DefaultInterfaceIndex(remoteAddr)
 				if interfaceIndex == -1 {
 					err = tun.ErrNoRoute
 				}
