@@ -1,7 +1,9 @@
 module github.com/sagernet/sing-box
 
 replace (
-	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240508102609-22c9b80c69b3
+	github.com/mattn/go-ieproxy => github.com/fanyiguang/go-ieproxy v0.0.0-20231120070622-b1a78033a014
+	github.com/sagernet/gvisor => github.com/sagernet/gvisor v0.0.0-20230627031050-1ab0276e0dd2
+	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240517081029-da0c93f7644c
 	github.com/sagernet/sing-shadowsocks v0.2.6 => github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119
 	github.com/sagernet/sing-shadowsocks2 v0.2.0 => github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac
 	github.com/sagernet/sing-tun => github.com/sagernet/sing-tun v0.1.16
@@ -51,13 +53,13 @@ require (
 	github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/cobra v1.8.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.26.0
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
 	golang.org/x/crypto v0.18.0
 	golang.org/x/net v0.20.0
 	golang.org/x/sync v0.5.0
-	golang.org/x/sys v0.16.0
+	golang.org/x/sys v0.19.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0

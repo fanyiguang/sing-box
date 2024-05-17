@@ -88,7 +88,7 @@ func (f *defaultFactory) Start() error {
 }
 
 func (f *defaultFactory) Close() error {
-	if !f.rotate.Disabled {
+	if !f.rotate.Disabled && f.logger != nil {
 		return f.logger.Close()
 	}
 	return common.Close(
