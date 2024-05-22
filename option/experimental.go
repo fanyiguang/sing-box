@@ -33,6 +33,14 @@ type ClashAPIOptions struct {
 	StoreSelected bool `json:"store_selected,omitempty"`
 	// Deprecated: migrated to global cache file
 	StoreFakeIP bool `json:"store_fakeip,omitempty"`
+
+	TrafficStatistics TrafficStatistics `json:"traffic_statistics,omitempty"`
+}
+
+type TrafficStatistics struct {
+	Output   string `json:"output,omitempty"`
+	Interval int    `json:"interval,omitempty"`
+	Enable   bool   `json:"enable,omitempty"`
 }
 
 type V2RayAPIOptions struct {

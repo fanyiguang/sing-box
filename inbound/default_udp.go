@@ -52,6 +52,7 @@ func (a *myInboundAdapter) loopUDPIn() {
 		buffer.Truncate(n)
 		var metadata adapter.InboundContext
 		metadata.Inbound = a.tag
+		metadata.ExternalIp = a.Ip
 		metadata.InboundType = a.protocol
 		metadata.InboundOptions = a.listenOptions.InboundOptions
 		metadata.Source = M.SocksaddrFromNetIP(addr).Unwrap()
@@ -80,6 +81,7 @@ func (a *myInboundAdapter) loopUDPOOBIn() {
 		buffer.Truncate(n)
 		var metadata adapter.InboundContext
 		metadata.Inbound = a.tag
+		metadata.ExternalIp = a.Ip
 		metadata.InboundType = a.protocol
 		metadata.InboundOptions = a.listenOptions.InboundOptions
 		metadata.Source = M.SocksaddrFromNetIP(addr).Unwrap()
@@ -104,6 +106,7 @@ func (a *myInboundAdapter) loopUDPInThreadSafe() {
 		buffer.Truncate(n)
 		var metadata adapter.InboundContext
 		metadata.Inbound = a.tag
+		metadata.ExternalIp = a.Ip
 		metadata.InboundType = a.protocol
 		metadata.InboundOptions = a.listenOptions.InboundOptions
 		metadata.Source = M.SocksaddrFromNetIP(addr).Unwrap()
@@ -130,6 +133,7 @@ func (a *myInboundAdapter) loopUDPOOBInThreadSafe() {
 		buffer.Truncate(n)
 		var metadata adapter.InboundContext
 		metadata.Inbound = a.tag
+		metadata.ExternalIp = a.Ip
 		metadata.InboundType = a.protocol
 		metadata.InboundOptions = a.listenOptions.InboundOptions
 		metadata.Source = M.SocksaddrFromNetIP(addr).Unwrap()

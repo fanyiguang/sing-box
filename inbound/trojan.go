@@ -36,7 +36,7 @@ type Trojan struct {
 	transport                adapter.V2RayServerTransport
 }
 
-func NewTrojan(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.TrojanInboundOptions) (*Trojan, error) {
+func NewTrojan(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.TrojanInboundOptions) (*Trojan, error) {
 	inbound := &Trojan{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeTrojan,
@@ -45,6 +45,7 @@ func NewTrojan(ctx context.Context, router adapter.Router, logger log.ContextLog
 			router:        router,
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 		users: options.Users,

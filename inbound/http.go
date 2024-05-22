@@ -30,7 +30,7 @@ type HTTP struct {
 	tlsConfig     tls.ServerConfig
 }
 
-func NewHTTP(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.HTTPMixedInboundOptions) (*HTTP, error) {
+func NewHTTP(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.HTTPMixedInboundOptions) (*HTTP, error) {
 	inbound := &HTTP{
 		myInboundAdapter: myInboundAdapter{
 			protocol:       C.TypeHTTP,
@@ -39,6 +39,7 @@ func NewHTTP(ctx context.Context, router adapter.Router, logger log.ContextLogge
 			router:         uot.NewRouter(router, logger),
 			logger:         logger,
 			tag:            tag,
+			Ip:             ip,
 			listenOptions:  options.ListenOptions,
 			setSystemProxy: options.SetSystemProxy,
 		},

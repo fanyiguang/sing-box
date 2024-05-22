@@ -29,7 +29,7 @@ type Socks struct {
 	tlsConfig     tls.ServerConfig
 }
 
-func NewSocks(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.SocksInboundOptions) (*Socks, error) {
+func NewSocks(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.SocksInboundOptions) (*Socks, error) {
 	inbound := &Socks{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeSOCKS,
@@ -38,6 +38,7 @@ func NewSocks(ctx context.Context, router adapter.Router, logger log.ContextLogg
 			router:        uot.NewRouter(router, logger),
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 		authenticator: auth.NewAuthenticator(options.Users),

@@ -18,12 +18,13 @@ type Redirect struct {
 	myInboundAdapter
 }
 
-func NewRedirect(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.RedirectInboundOptions) *Redirect {
+func NewRedirect(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.RedirectInboundOptions) *Redirect {
 	redirect := &Redirect{
 		myInboundAdapter{
 			protocol:      C.TypeRedirect,
 			network:       []string{N.NetworkTCP},
 			ctx:           ctx,
+			Ip:            ip,
 			router:        router,
 			logger:        logger,
 			tag:           tag,

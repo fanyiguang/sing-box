@@ -30,6 +30,7 @@ type Metadata struct {
 	ProcessPath    string         `json:"processPath"`
 	OutboundServer string         `json:"outbound_server"`
 	Extend         *option.Extend `json:"-"`
+	ExternalIp     string         `json:"-"`
 }
 
 type tracker interface {
@@ -140,9 +141,11 @@ func NewTCPTracker(conn net.Conn, manager *Manager, metadata Metadata, router ad
 		ExtendedConn: bufio.NewCounterConn(conn, []N.CountFunc{func(n int64) {
 			upload.Add(n)
 			manager.PushUploaded(n)
+			manager.PushInboundTcpUploaded(metadata.ExternalIp, n)
 		}}, []N.CountFunc{func(n int64) {
 			download.Add(n)
 			manager.PushDownloaded(n)
+			manager.PushInboundTcpDownloaded(metadata.ExternalIp, n)
 		}}),
 		manager: manager,
 		trackerInfo: &trackerInfo{
@@ -230,9 +233,11 @@ func NewUDPTracker(conn N.PacketConn, manager *Manager, metadata Metadata, route
 		PacketConn: bufio.NewCounterPacketConn(conn, []N.CountFunc{func(n int64) {
 			upload.Add(n)
 			manager.PushUploaded(n)
+			manager.PushInboundUdpUploaded(metadata.ExternalIp, n)
 		}}, []N.CountFunc{func(n int64) {
 			download.Add(n)
 			manager.PushDownloaded(n)
+			manager.PushInboundUdpDownloaded(metadata.ExternalIp, n)
 		}}),
 		manager: manager,
 		trackerInfo: &trackerInfo{

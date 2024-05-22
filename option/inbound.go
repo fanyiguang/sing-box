@@ -11,6 +11,7 @@ import (
 type _Inbound struct {
 	Type               string                    `json:"type"`
 	Tag                string                    `json:"tag,omitempty"`
+	IP                 string                    `json:"ip"`
 	TunOptions         TunInboundOptions         `json:"-"`
 	RedirectOptions    RedirectInboundOptions    `json:"-"`
 	TProxyOptions      TProxyInboundOptions      `json:"-"`

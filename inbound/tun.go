@@ -25,6 +25,7 @@ var _ adapter.Inbound = (*Tun)(nil)
 
 type Tun struct {
 	tag                    string
+	ip                     string
 	ctx                    context.Context
 	router                 adapter.Router
 	logger                 log.ContextLogger
@@ -39,7 +40,7 @@ type Tun struct {
 	platformOptions        option.TunPlatformOptions
 }
 
-func NewTun(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.TunInboundOptions, platformInterface platform.Interface) (*Tun, error) {
+func NewTun(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.TunInboundOptions, platformInterface platform.Interface) (*Tun, error) {
 	tunMTU := options.MTU
 	if tunMTU == 0 {
 		tunMTU = 9000
@@ -68,6 +69,7 @@ func NewTun(ctx context.Context, router adapter.Router, logger log.ContextLogger
 	}
 	return &Tun{
 		tag:            tag,
+		ip:             ip,
 		ctx:            ctx,
 		router:         router,
 		logger:         logger,
@@ -201,6 +203,7 @@ func (t *Tun) NewConnection(ctx context.Context, conn net.Conn, upstreamMetadata
 	ctx = log.ContextWithNewID(ctx)
 	var metadata adapter.InboundContext
 	metadata.Inbound = t.tag
+	metadata.ExternalIp = t.ip
 	metadata.InboundType = C.TypeTun
 	metadata.Source = upstreamMetadata.Source
 	metadata.Destination = upstreamMetadata.Destination
@@ -218,6 +221,7 @@ func (t *Tun) NewPacketConnection(ctx context.Context, conn N.PacketConn, upstre
 	ctx = log.ContextWithNewID(ctx)
 	var metadata adapter.InboundContext
 	metadata.Inbound = t.tag
+	metadata.ExternalIp = t.ip
 	metadata.InboundType = C.TypeTun
 	metadata.Source = upstreamMetadata.Source
 	metadata.Destination = upstreamMetadata.Destination

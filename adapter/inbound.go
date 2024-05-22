@@ -58,7 +58,8 @@ type InboundContext struct {
 	DestinationAddressMatch bool
 	DestinationPortMatch    bool
 
-	Extend *option.Extend
+	Extend     *option.Extend
+	ExternalIp string // 出口ip
 }
 
 func (c *InboundContext) ResetRuleCache() {

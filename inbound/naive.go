@@ -38,7 +38,7 @@ type Naive struct {
 	h3Server      any
 }
 
-func NewNaive(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.NaiveInboundOptions) (*Naive, error) {
+func NewNaive(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.NaiveInboundOptions) (*Naive, error) {
 	inbound := &Naive{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeNaive,
@@ -47,6 +47,7 @@ func NewNaive(ctx context.Context, router adapter.Router, logger log.ContextLogg
 			router:        uot.NewRouter(router, logger),
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 		authenticator: auth.NewAuthenticator(options.Users),

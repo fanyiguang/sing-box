@@ -38,7 +38,7 @@ type VLESS struct {
 	transport adapter.V2RayServerTransport
 }
 
-func NewVLESS(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.VLESSInboundOptions) (*VLESS, error) {
+func NewVLESS(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.VLESSInboundOptions) (*VLESS, error) {
 	inbound := &VLESS{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeVLESS,
@@ -47,6 +47,7 @@ func NewVLESS(ctx context.Context, router adapter.Router, logger log.ContextLogg
 			router:        uot.NewRouter(router, logger),
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 		ctx:   ctx,

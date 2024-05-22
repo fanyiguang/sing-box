@@ -20,7 +20,7 @@ type ShadowTLS struct {
 	service *shadowtls.Service
 }
 
-func NewShadowTLS(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.ShadowTLSInboundOptions) (*ShadowTLS, error) {
+func NewShadowTLS(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.ShadowTLSInboundOptions) (*ShadowTLS, error) {
 	inbound := &ShadowTLS{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeShadowTLS,
@@ -29,6 +29,7 @@ func NewShadowTLS(ctx context.Context, router adapter.Router, logger log.Context
 			router:        router,
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 	}

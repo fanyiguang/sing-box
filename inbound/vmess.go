@@ -38,7 +38,7 @@ type VMess struct {
 	transport adapter.V2RayServerTransport
 }
 
-func NewVMess(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.VMessInboundOptions) (*VMess, error) {
+func NewVMess(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.VMessInboundOptions) (*VMess, error) {
 	inbound := &VMess{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeVMess,
@@ -47,6 +47,7 @@ func NewVMess(ctx context.Context, router adapter.Router, logger log.ContextLogg
 			router:        uot.NewRouter(router, logger),
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 		ctx:   ctx,

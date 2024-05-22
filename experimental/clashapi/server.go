@@ -56,7 +56,7 @@ type Server struct {
 }
 
 func NewServer(ctx context.Context, router adapter.Router, logFactory log.ObservableFactory, options option.ClashAPIOptions) (adapter.ClashServer, error) {
-	trafficManager := trafficontrol.NewManager()
+	trafficManager := trafficontrol.NewManager(options.TrafficStatistics)
 	chiRouter := chi.NewRouter()
 	server := &Server{
 		ctx:    ctx,
@@ -269,6 +269,7 @@ func castMetadata(metadata adapter.InboundContext) trafficontrol.Metadata {
 		ProcessPath:    processPath,
 		OutboundServer: metadata.OutboundServer,
 		Extend:         metadata.Extend,
+		ExternalIp:     metadata.ExternalIp,
 	}
 }
 

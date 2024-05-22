@@ -25,6 +25,7 @@ type myInboundAdapter struct {
 	router           adapter.ConnectionRouter
 	logger           log.ContextLogger
 	tag              string
+	Ip               string
 	listenOptions    option.ListenOptions
 	connHandler      adapter.ConnectionHandler
 	packetHandler    adapter.PacketHandler
@@ -152,6 +153,7 @@ func (a *myInboundAdapter) newPacketConnection(ctx context.Context, conn N.Packe
 
 func (a *myInboundAdapter) createMetadata(conn net.Conn, metadata adapter.InboundContext) adapter.InboundContext {
 	metadata.Inbound = a.tag
+	metadata.ExternalIp = a.Ip
 	metadata.InboundType = a.protocol
 	metadata.InboundDetour = a.listenOptions.Detour
 	metadata.InboundOptions = a.listenOptions.InboundOptions
@@ -169,6 +171,7 @@ func (a *myInboundAdapter) createMetadata(conn net.Conn, metadata adapter.Inboun
 
 func (a *myInboundAdapter) createPacketMetadata(conn N.PacketConn, metadata adapter.InboundContext) adapter.InboundContext {
 	metadata.Inbound = a.tag
+	metadata.ExternalIp = a.Ip
 	metadata.InboundType = a.protocol
 	metadata.InboundDetour = a.listenOptions.Detour
 	metadata.InboundOptions = a.listenOptions.InboundOptions

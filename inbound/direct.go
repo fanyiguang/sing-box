@@ -25,7 +25,7 @@ type Direct struct {
 	overrideDestination M.Socksaddr
 }
 
-func NewDirect(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.DirectInboundOptions) *Direct {
+func NewDirect(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.DirectInboundOptions) *Direct {
 	options.UDPFragmentDefault = true
 	inbound := &Direct{
 		myInboundAdapter: myInboundAdapter{
@@ -35,6 +35,7 @@ func NewDirect(ctx context.Context, router adapter.Router, logger log.ContextLog
 			router:        router,
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 	}

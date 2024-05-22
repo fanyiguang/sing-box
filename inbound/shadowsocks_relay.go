@@ -31,7 +31,7 @@ type ShadowsocksRelay struct {
 	destinations []option.ShadowsocksDestination
 }
 
-func newShadowsocksRelay(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.ShadowsocksInboundOptions) (*ShadowsocksRelay, error) {
+func newShadowsocksRelay(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.ShadowsocksInboundOptions) (*ShadowsocksRelay, error) {
 	inbound := &ShadowsocksRelay{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeShadowsocks,
@@ -40,6 +40,7 @@ func newShadowsocksRelay(ctx context.Context, router adapter.Router, logger log.
 			router:        uot.NewRouter(router, logger),
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 		destinations: options.Destinations,

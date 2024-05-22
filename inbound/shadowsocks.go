@@ -22,16 +22,16 @@ import (
 	"github.com/sagernet/sing/common/ntp"
 )
 
-func NewShadowsocks(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.ShadowsocksInboundOptions) (adapter.Inbound, error) {
+func NewShadowsocks(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.ShadowsocksInboundOptions) (adapter.Inbound, error) {
 	if len(options.Users) > 0 && len(options.Destinations) > 0 {
 		return nil, E.New("users and destinations options must not be combined")
 	}
 	if len(options.Users) > 0 {
-		return newShadowsocksMulti(ctx, router, logger, tag, options)
+		return newShadowsocksMulti(ctx, router, logger, tag, ip, options)
 	} else if len(options.Destinations) > 0 {
-		return newShadowsocksRelay(ctx, router, logger, tag, options)
+		return newShadowsocksRelay(ctx, router, logger, tag, ip, options)
 	} else {
-		return newShadowsocks(ctx, router, logger, tag, options)
+		return newShadowsocks(ctx, router, logger, tag, ip, options)
 	}
 }
 
@@ -45,7 +45,7 @@ type Shadowsocks struct {
 	service shadowsocks.Service
 }
 
-func newShadowsocks(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.ShadowsocksInboundOptions) (*Shadowsocks, error) {
+func newShadowsocks(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.ShadowsocksInboundOptions) (*Shadowsocks, error) {
 	inbound := &Shadowsocks{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeShadowsocks,
@@ -54,6 +54,7 @@ func newShadowsocks(ctx context.Context, router adapter.Router, logger log.Conte
 			router:        uot.NewRouter(router, logger),
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 	}

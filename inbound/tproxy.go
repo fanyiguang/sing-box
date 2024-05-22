@@ -26,7 +26,7 @@ type TProxy struct {
 	udpNat *udpnat.Service[netip.AddrPort]
 }
 
-func NewTProxy(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.TProxyInboundOptions) *TProxy {
+func NewTProxy(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag, ip string, options option.TProxyInboundOptions) *TProxy {
 	tproxy := &TProxy{
 		myInboundAdapter: myInboundAdapter{
 			protocol:      C.TypeTProxy,
@@ -35,6 +35,7 @@ func NewTProxy(ctx context.Context, router adapter.Router, logger log.ContextLog
 			router:        router,
 			logger:        logger,
 			tag:           tag,
+			Ip:            ip,
 			listenOptions: options.ListenOptions,
 		},
 	}
