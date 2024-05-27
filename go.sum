@@ -25,8 +25,7 @@ github.com/dop251/goja v0.0.0-20210427212725-462d53687b0d/go.mod h1:R9ET47fwRVRP
 github.com/dop251/goja_nodejs v0.0.0-20210225215109-d91c329300e7/go.mod h1:hn7BA7c8pLvoGndExHudxTDKZ84Pyvv+90pbBjbTz0Y=
 github.com/fanyiguang/go-ieproxy v0.0.0-20231120070622-b1a78033a014 h1:QNa9SriCoUwK9RA39jCy3GRVKpS3ivP6mR2yA4iKtCg=
 github.com/fanyiguang/go-ieproxy v0.0.0-20231120070622-b1a78033a014/go.mod h1:/NsJd+kxZBmjMc5hrJCKMbP57B84rvq9BiDRbtO9AS0=
-github.com/fanyiguang/sing v0.2.5-0.20240508102609-22c9b80c69b3 h1:cMiaKahfIiwlOt1KJclb0VSCGqGvOVKf0HIxjnmuzLg=
-github.com/fanyiguang/sing v0.2.5-0.20240508102609-22c9b80c69b3/go.mod h1:9pfuAH6mZfgnz/YjP6xu5sxx882rfyjpcrTdUpd6w3g=
+github.com/fanyiguang/sing v0.2.5-0.20240517081029-da0c93f7644c h1:9Onk8hlGyH2vDPWVp270AKahGiUrtkzlJISmIkLIIag=
 github.com/fanyiguang/sing v0.2.5-0.20240517081029-da0c93f7644c/go.mod h1:9pfuAH6mZfgnz/YjP6xu5sxx882rfyjpcrTdUpd6w3g=
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119 h1:MZ7jRmpDgMzZJYllaWowrSUaZ0bIqzXrDjn6BsJdyEk=
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119/go.mod h1:j2YZBIpWIuElPFL/5sJAj470bcn/3QQ5lxZUNKLDNAM=
@@ -164,7 +163,6 @@ github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
-github.com/stretchr/objx v0.5.2/go.mod h1:FRsXN1f5AsAjCGJKqEizvkpNtU+EGNCLh3NxZ/8L+MA=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
