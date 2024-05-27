@@ -22,6 +22,8 @@ build-server:
 	GOOS=linux GOARCH=arm go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-arm $(MAIN)
 	GOOS=windows GOARCH=amd64 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-win.exe $(MAIN)
 
+build-server-linux-arm:
+	GOOS=linux GOARCH=arm go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-arm $(MAIN)
 build-server-linux:
 	GOOS=linux GOARCH=amd64 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-amd64 $(MAIN)
 
