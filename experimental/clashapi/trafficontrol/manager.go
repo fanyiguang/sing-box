@@ -91,8 +91,8 @@ func (i *InboundTrafficStatistics) handle() {
 			udpDown = i.udpDownloadTemp.getAndClear()
 
 			timestamp := time.Now().Unix()
-			i.printLog(tcpUp, tcpDown, timestamp, "t")
-			i.printLog(udpUp, udpDown, timestamp, "u")
+			i.printLog(tcpDown, tcpUp, timestamp, "t")
+			i.printLog(udpDown, udpUp, timestamp, "u")
 		}
 	}
 }
