@@ -3,6 +3,7 @@ package outbound
 import (
 	"context"
 	"net"
+	"net/http"
 	"net/netip"
 	"os"
 	"runtime"
@@ -57,6 +58,20 @@ func NewConnection(ctx context.Context, this N.Dialer, conn net.Conn, metadata a
 	if err != nil {
 		return N.HandshakeFailure(conn, err)
 	}
+
+	if metadata.HttpConnectMode {
+		fConn := newFackConn(conn, func(req *http.Request) {
+			// 修改鉴权信息
+			req.Header.Del("Proxy-Authorization")
+			if metadata.HttpAuthStr != "" {
+				req.Header.Add("Proxy-Authorization", "Basic "+metadata.HttpAuthStr)
+			}
+			req.URL.Scheme = "http"
+		})
+
+		return CopyConn(ctx, fConn, outConn)
+	}
+
 	return CopyEarlyConn(ctx, conn, outConn)
 }
 

@@ -73,6 +73,17 @@ func (h *HTTP) DialContext(ctx context.Context, network string, destination M.So
 	metadata.Outbound = h.tag
 	metadata.Destination = destination
 	h.logger.InfoContext(ctx, "outbound connection to ", destination)
+
+	if h.autoMode && metadata.Protocol == C.ProtocolHTTP {
+		outConn, err := h.detour.DialContext(ctx, N.NetworkTCP, h.serverAddr)
+		if err != nil {
+			return nil, err
+		}
+		metadata.HttpAuthStr = h.httpAuthString
+		metadata.HttpConnectMode = true
+		return outConn, nil
+	}
+
 	return h.client.DialContext(ctx, network, destination)
 }
 
@@ -81,23 +92,6 @@ func (h *HTTP) ListenPacket(ctx context.Context, destination M.Socksaddr) (net.P
 }
 
 func (h *HTTP) NewConnection(ctx context.Context, conn net.Conn, metadata adapter.InboundContext) error {
-	if h.autoMode && metadata.Protocol == C.ProtocolHTTP {
-		outConn, err := h.detour.DialContext(ctx, N.NetworkTCP, h.serverAddr)
-		if err != nil {
-			return err
-		}
-
-		fConn := newFackConn(conn, func(req *http.Request) {
-			// 修改鉴权信息
-			req.Header.Del("Proxy-Authorization")
-			if h.httpAuthString != "" {
-				req.Header.Add("Proxy-Authorization", "Basic "+h.httpAuthString)
-			}
-			req.URL.Scheme = "http"
-		})
-
-		return CopyConn(ctx, fConn, outConn)
-	}
 	return NewConnection(ctx, h, conn, metadata)
 }
 
