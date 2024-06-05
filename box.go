@@ -3,6 +3,7 @@ package box
 import (
 	"context"
 	"fmt"
+	anyLog "github.com/sagernet/sing-box/common/log"
 	"io"
 	"os"
 	"runtime/debug"
@@ -173,6 +174,10 @@ func New(options Options) (*Box, error) {
 		}
 		router.SetClashServer(clashServer)
 		preServices2["clash api"] = clashServer
+		if clashAPIOptions.ConnectInfoLogPath == "" {
+			clashAPIOptions.ConnectInfoLogPath = "./debug.log"
+		}
+		anyLog.Init(clashAPIOptions.ConnectInfoLogPath)
 	}
 	if needV2RayAPI {
 		v2rayServer, err := experimental.NewV2RayServer(logFactory.NewLogger("v2ray-api"), common.PtrValueOrDefault(experimentalOptions.V2RayAPI))

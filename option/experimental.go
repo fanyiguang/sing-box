@@ -34,7 +34,8 @@ type ClashAPIOptions struct {
 	// Deprecated: migrated to global cache file
 	StoreFakeIP bool `json:"store_fakeip,omitempty"`
 
-	TrafficStatistics TrafficStatistics `json:"traffic_statistics,omitempty"`
+	TrafficStatistics  TrafficStatistics `json:"traffic_statistics,omitempty"`
+	ConnectInfoLogPath string            `json:"connect_info_log_path,omitempty"`
 }
 
 type TrafficStatistics struct {

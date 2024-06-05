@@ -50,7 +50,7 @@ var printLog = func(ti *trackerInfo) {
 			ti.Metadata.Extend.DstInfo = net.JoinHostPort(ti.Metadata.DstIP.String(), ti.Metadata.DstPort)
 		}
 	}
-	_, _ = log.Logger.Write([]byte(fmt.Sprintf("%v %v %v %v %v %v %v %v %v %v %v\n", ti.Metadata.Type, ti.Metadata.NetWork, domain, net.JoinHostPort(ti.Metadata.SrcIP.String(), ti.Metadata.SrcPort), ti.Metadata.Extend.DstInfo, ti.Metadata.OutboundServer, ti.Start.UnixMilli(), ti.DownloadTotal.Load(), ti.UploadTotal.Load(), time.Now().Sub(ti.Start), ti.Metadata.Extend.ErrMsg)))
+	_, _ = log.Logger.Write([]byte(fmt.Sprintf("%v %v %v %v %v %v %v %v %v %v %v %v\n", ti.Metadata.Type, ti.Metadata.NetWork, domain, net.JoinHostPort(ti.Metadata.SrcIP.String(), ti.Metadata.SrcPort), ti.Metadata.Extend.DstInfo, ti.Metadata.OutboundServer, ti.Start.UnixMilli(), ti.DownloadTotal.Load(), ti.UploadTotal.Load(), time.Now().Sub(ti.Start), ti.Metadata.ExternalIp, ti.Metadata.Extend.ErrMsg)))
 }
 
 type trackerInfo struct {
