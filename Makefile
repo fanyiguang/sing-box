@@ -24,7 +24,9 @@ build-server:
 
 build-server-linux-arm:
 	GOOS=linux GOARCH=arm go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-arm $(MAIN)
-build-server-linux:
+build-server-linux-amd64:
+	GOOS=linux GOARCH=amd64 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-amd64 $(MAIN)
+build-server-linux-x86:
 	GOOS=linux GOARCH=386 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-x86 $(MAIN)
 
 build:
