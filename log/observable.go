@@ -65,7 +65,7 @@ func NewDefaultFactory(
 
 func (f *defaultFactory) Start() error {
 	if f.filePath != "" {
-		if !f.rotate.Disabled {
+		if f.rotate.Disabled {
 			logger := &lumberjack.Logger{
 				LocalTime:  true,
 				Filename:   f.filePath,
