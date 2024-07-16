@@ -1,8 +1,6 @@
 package trafficontrol
 
 import (
-	"fmt"
-	"github.com/sagernet/sing-box/common/log"
 	"github.com/sagernet/sing-box/option"
 	"net"
 	"net/netip"
@@ -36,20 +34,6 @@ type tracker interface {
 	ID() string
 	Close() error
 	Leave()
-}
-
-var printLog = func(ti *trackerInfo) {
-	domain := ti.Metadata.Host
-	if ti.Metadata.Extend == nil {
-		ti.Metadata.Extend = new(option.Extend)
-	}
-	if domain == "" {
-		//domain = net.JoinHostPort(ti.Metadata.DstIP.String(), ti.Metadata.DstPort)
-		if ti.Metadata.Extend.DstInfo == "" {
-			ti.Metadata.Extend.DstInfo = net.JoinHostPort(ti.Metadata.DstIP.String(), ti.Metadata.DstPort)
-		}
-	}
-	_, _ = log.Logger.Write([]byte(fmt.Sprintf("%v %v %v %v %v %v %v %v %v %v %v\n", ti.Metadata.Type, ti.Metadata.NetWork, domain, net.JoinHostPort(ti.Metadata.SrcIP.String(), ti.Metadata.SrcPort), ti.Metadata.Extend.DstInfo, ti.Metadata.OutboundServer, ti.Start.UnixMilli(), ti.DownloadTotal.Load(), ti.UploadTotal.Load(), time.Now().Sub(ti.Start), ti.Metadata.Extend.ErrMsg)))
 }
 
 type trackerInfo struct {
@@ -92,7 +76,7 @@ func (tt *tcpTracker) Close() error {
 }
 
 func (tt *tcpTracker) Leave() {
-	printLog(tt.trackerInfo)
+	//printLog(tt.trackerInfo)
 	tt.manager.Leave(tt)
 }
 
@@ -182,7 +166,7 @@ func (ut *udpTracker) Close() error {
 }
 
 func (ut *udpTracker) Leave() {
-	printLog(ut.trackerInfo)
+	//printLog(ut.trackerInfo)
 	ut.manager.Leave(ut)
 }
 
