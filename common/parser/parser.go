@@ -87,6 +87,26 @@ func GetHostAndPortFromUrl(url *url.URL) (netip.Addr, uint16, error) {
 	return addr, uint16(port), nil
 }
 
+func GetHostStrAndPortFromUrl(url *url.URL) (string, uint16, error) {
+	host, p, err := net.SplitHostPort(url.Host)
+	if err != nil {
+		return "", 0, exceptions.Cause(err, "get inbound config error")
+	}
+
+	if host == "" {
+		return "", 0, exceptions.New("error ip addr: ", host)
+	}
+
+	port, err := strconv.Atoi(p)
+	if err != nil {
+		return "", 0, exceptions.Cause(err, p, "is not number")
+	}
+	if port >= 65535 || port <= 0 {
+		return "", 0, exceptions.New(p, "is not in range [1-65535]")
+	}
+	return host, uint16(port), nil
+}
+
 func GetAuthInfoFromUrl(url *url.URL) *auth.User {
 	if url.User != nil {
 		username := url.User.Username()
@@ -184,7 +204,7 @@ func GetOutboundFromURL(url *url.URL, index int, detourName string) (option.Outb
 func parseOutboundSocks(url *url.URL, index int, detourName string, enableTLS bool) (option.Outbound, error) {
 	auth := GetAuthInfoFromUrl(url)
 
-	addr, port, err := GetHostAndPortFromUrl(url)
+	addr, port, err := GetHostStrAndPortFromUrl(url)
 	if err != nil {
 		return option.Outbound{}, err
 	}
@@ -205,7 +225,7 @@ func parseOutboundSocks(url *url.URL, index int, detourName string, enableTLS bo
 				Detour: detourName,
 			},
 			ServerOptions: option.ServerOptions{
-				Server:     addr.String(),
+				Server:     addr,
 				ServerPort: port,
 			},
 			OutboundTLSOptionsContainer: option.OutboundTLSOptionsContainer{TLS: tls},
@@ -221,7 +241,7 @@ func parseOutboundSocks(url *url.URL, index int, detourName string, enableTLS bo
 func parseOutboundSSH(url *url.URL, index int, detourName string) (option.Outbound, error) {
 	auth := GetAuthInfoFromUrl(url)
 
-	addr, port, err := GetHostAndPortFromUrl(url)
+	addr, port, err := GetHostStrAndPortFromUrl(url)
 	if err != nil {
 		return option.Outbound{}, err
 	}
@@ -234,7 +254,7 @@ func parseOutboundSSH(url *url.URL, index int, detourName string) (option.Outbou
 				Detour: detourName,
 			},
 			ServerOptions: option.ServerOptions{
-				Server:     addr.String(),
+				Server:     addr,
 				ServerPort: port,
 			},
 		},
@@ -249,7 +269,7 @@ func parseOutboundSSH(url *url.URL, index int, detourName string) (option.Outbou
 
 func parseOutboundSS(url *url.URL, index int, detourName string) (option.Outbound, error) {
 	auth := GetAuthInfoFromUrl(url)
-	addr, port, err := GetHostAndPortFromUrl(url)
+	addr, port, err := GetHostStrAndPortFromUrl(url)
 	if err != nil {
 		return option.Outbound{}, err
 	}
@@ -262,7 +282,7 @@ func parseOutboundSS(url *url.URL, index int, detourName string) (option.Outboun
 				Detour: detourName,
 			},
 			ServerOptions: option.ServerOptions{
-				Server:     addr.String(),
+				Server:     addr,
 				ServerPort: port,
 			},
 		},
@@ -287,7 +307,7 @@ func parseOutboundSS(url *url.URL, index int, detourName string) (option.Outboun
 func parseOutboundHttp(url *url.URL, index int, detourName string, enableTLS bool) (option.Outbound, error) {
 	auth := GetAuthInfoFromUrl(url)
 
-	addr, port, err := GetHostAndPortFromUrl(url)
+	addr, port, err := GetHostStrAndPortFromUrl(url)
 	if err != nil {
 		return option.Outbound{}, err
 	}
@@ -308,7 +328,7 @@ func parseOutboundHttp(url *url.URL, index int, detourName string, enableTLS boo
 				Detour: detourName,
 			},
 			ServerOptions: option.ServerOptions{
-				Server:     addr.String(),
+				Server:     addr,
 				ServerPort: port,
 			},
 			OutboundTLSOptionsContainer: option.OutboundTLSOptionsContainer{TLS: tls},
