@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/sagernet/sing-box/common/host"
 	"net"
 	"net/netip"
 	"net/url"
@@ -102,6 +103,8 @@ type Router struct {
 	needPackageManager                 bool
 	wifiState                          adapter.WIFIState
 	started                            bool
+
+	hosts []*host.Host
 }
 
 func NewRouter(
@@ -152,6 +155,13 @@ func NewRouter(
 			return nil, E.Cause(err, "parse rule[", i, "]")
 		}
 		router.rules = append(router.rules, routeRule)
+	}
+	for i, h := range options.Hosts {
+		_host, err := host.New(h.Domain, h.Addresses)
+		if err != nil {
+			return nil, E.Cause(err, "parse host[", i, "]")
+		}
+		router.hosts = append(router.hosts, _host)
 	}
 	for i, dnsRuleOptions := range dnsOptions.Rules {
 		dnsRule, err := NewDNSRule(router, router.logger, dnsRuleOptions, true)
@@ -818,8 +828,16 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 		}
 	}
 
+	for _, h := range r.hosts {
+		if h != nil {
+			if h.Match(metadata.Destination.Fqdn) {
+				metadata.DestinationAddresses = h.Addresses()
+				r.dnsLogger.DebugContext(ctx, "host bind resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+			}
+		}
+	}
 	destination := metadata.Destination
-	if metadata.Destination.IsFqdn() && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
+	if metadata.Destination.IsFqdn() && metadata.DestinationAddresses == nil && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
 		if err != nil {
 			return err
@@ -948,8 +966,16 @@ func (r *Router) RoutePacketConnection(ctx context.Context, conn N.PacketConn, m
 			r.logger.DebugContext(ctx, "found reserve mapped domain: ", metadata.Domain)
 		}
 	}
+	for _, h := range r.hosts {
+		if h != nil {
+			if h.Match(metadata.Destination.Fqdn) {
+				metadata.DestinationAddresses = h.Addresses()
+				r.dnsLogger.DebugContext(ctx, "host bind resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+			}
+		}
+	}
 	destination := metadata.Destination
-	if metadata.Destination.IsFqdn() && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
+	if metadata.Destination.IsFqdn() && metadata.DestinationAddresses == nil && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
 		if err != nil {
 			return err
