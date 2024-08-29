@@ -43,7 +43,7 @@ func NewSocks(router adapter.Router, logger log.ContextLogger, tag string, optio
 	if err != nil {
 		return nil, err
 	}
-	detour, err := tls.NewDialerFromOptions(context.Background(), router, outboundDialer, options.Server, common.PtrValueOrDefault(options.TLS))
+	detour, tls, err := tls.NewDialerFromOptions(context.Background(), router, outboundDialer, options.Server, common.PtrValueOrDefault(options.TLS))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func NewSocks(router adapter.Router, logger log.ContextLogger, tag string, optio
 			dependencies:   withDialerDependency(options.DialerOptions),
 			outboundServer: options.ServerOptions.Build(),
 		},
-		client:  socks.NewClient(detour, options.ServerOptions.Build(), version, options.Username, options.Password),
+		client:  socks.NewClient(detour, outboundDialer, options.ServerOptions.Build(), version, options.Username, options.Password, tls),
 		resolve: version == socks.Version4,
 	}
 	uotOptions := common.PtrValueOrDefault(options.UDPOverTCP)

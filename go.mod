@@ -3,7 +3,7 @@ module github.com/sagernet/sing-box
 replace (
 	github.com/mattn/go-ieproxy => github.com/fanyiguang/go-ieproxy v0.0.0-20231120070622-b1a78033a014
 	github.com/sagernet/gvisor => github.com/sagernet/gvisor v0.0.0-20230627031050-1ab0276e0dd2
-	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240517081029-da0c93f7644c
+	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240829113950-e59046ec6774
 	github.com/sagernet/sing-shadowsocks v0.2.6 => github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119
 	github.com/sagernet/sing-shadowsocks2 v0.2.0 => github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac
 	github.com/sagernet/sing-tun => github.com/sagernet/sing-tun v0.1.16

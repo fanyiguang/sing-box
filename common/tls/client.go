@@ -14,15 +14,15 @@ import (
 	aTLS "github.com/sagernet/sing/common/tls"
 )
 
-func NewDialerFromOptions(ctx context.Context, router adapter.Router, dialer N.Dialer, serverAddress string, options option.OutboundTLSOptions) (N.Dialer, error) {
+func NewDialerFromOptions(ctx context.Context, router adapter.Router, dialer N.Dialer, serverAddress string, options option.OutboundTLSOptions) (N.Dialer, bool, error) {
 	if !options.Enabled {
-		return dialer, nil
+		return dialer, false, nil
 	}
 	config, err := NewClient(ctx, serverAddress, options)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
-	return NewDialer(dialer, config), nil
+	return NewDialer(dialer, config), true, nil
 }
 
 func NewClient(ctx context.Context, serverAddress string, options option.OutboundTLSOptions) (Config, error) {
