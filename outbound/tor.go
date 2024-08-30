@@ -160,7 +160,7 @@ func (t *Tor) start() error {
 	}
 	t.logger.Trace("obtained tor socks5 address ", info[0].Val)
 	// TODO: set password for tor socks5 server if supported
-	t.socksClient = socks.NewClient(N.SystemDialer, N.SystemDialer, M.ParseSocksaddr(info[0].Val), socks.Version5, "", "", false)
+	t.socksClient = socks.NewClient(N.SystemDialer, N.SystemDialer, M.ParseSocksaddr(info[0].Val), socks.Version5, "", "", false, false)
 	return nil
 }
 

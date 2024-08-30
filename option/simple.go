@@ -22,6 +22,7 @@ type SocksOutboundOptions struct {
 	Username   string             `json:"username,omitempty"`
 	Password   string             `json:"password,omitempty"`
 	Network    NetworkList        `json:"network,omitempty"`
+	UseAddr    bool               `json:"user_addr,omitempty"`
 	UDPOverTCP *UDPOverTCPOptions `json:"udp_over_tcp,omitempty"`
 	OutboundTLSOptionsContainer
 }
