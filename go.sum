@@ -27,6 +27,7 @@ github.com/fanyiguang/go-ieproxy v0.0.0-20231120070622-b1a78033a014 h1:QNa9SriCo
 github.com/fanyiguang/go-ieproxy v0.0.0-20231120070622-b1a78033a014/go.mod h1:/NsJd+kxZBmjMc5hrJCKMbP57B84rvq9BiDRbtO9AS0=
 github.com/fanyiguang/sing v0.2.5-0.20240812073735-1d313f5e9376 h1:vubP+7XNWhCJ6usfvRHBVgnnkb3SXiQvr+OTJGBW4jM=
 github.com/fanyiguang/sing v0.2.5-0.20240812073735-1d313f5e9376/go.mod h1:9pfuAH6mZfgnz/YjP6xu5sxx882rfyjpcrTdUpd6w3g=
+github.com/fanyiguang/sing v0.2.5-0.20240910053819-cfc1e19fea43/go.mod h1:9pfuAH6mZfgnz/YjP6xu5sxx882rfyjpcrTdUpd6w3g=
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119 h1:MZ7jRmpDgMzZJYllaWowrSUaZ0bIqzXrDjn6BsJdyEk=
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119/go.mod h1:j2YZBIpWIuElPFL/5sJAj470bcn/3QQ5lxZUNKLDNAM=
 github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac h1:PEW5UkXvd96kJ8UAxnHk9PZ9sGgii1a01h5mirH+g0w=

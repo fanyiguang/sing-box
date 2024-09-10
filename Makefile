@@ -16,8 +16,10 @@ PREFIX ?= $(shell go env GOPATH)
 
 .PHONY: test release docs
 
-build-server:
+build-server-32:
 	GOOS=linux GOARCH=386 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-x86 $(MAIN)
+
+build-server:
 	GOOS=linux GOARCH=amd64 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-amd64 $(MAIN)
 	GOOS=linux GOARCH=arm go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-arm $(MAIN)
 
