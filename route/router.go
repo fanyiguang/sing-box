@@ -839,13 +839,14 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 	destination := metadata.Destination
 	if metadata.Destination.IsFqdn() && metadata.DestinationAddresses == nil && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
-		if err != nil {
-			return err
+		if err == nil {
+			metadata.DestinationAddresses = addresses
+			r.dnsLogger.DebugContext(ctx, "resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+		} else {
+			r.dnsLogger.WarnContext(ctx, E.Cause(err, "failed to resolve ", metadata.Destination.Fqdn))
 		}
-		metadata.DestinationAddresses = addresses
-		r.dnsLogger.InfoContext(ctx, fmt.Sprintf("tcp port_1: %v, port_2: %v", destination.String(), metadata.Destination.String()))
 		metadata.Destination = destination
-		r.dnsLogger.DebugContext(ctx, "resolved [", strings.Join(F.MapToString(metadata.DestinationAddresses), " "), "]")
+		r.dnsLogger.InfoContext(ctx, fmt.Sprintf("tcp port_1: %v, port_2: %v", destination.String(), metadata.Destination.String()))
 	}
 	if metadata.Destination.IsIPv4() {
 		metadata.IPVersion = 4
