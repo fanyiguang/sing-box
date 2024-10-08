@@ -9,7 +9,7 @@ replace (
 	github.com/sagernet/sing-tun => github.com/sagernet/sing-tun v0.1.16
 )
 
-go 1.20
+go 1.19
 
 require (
 	berty.tech/go-libtor v1.0.385

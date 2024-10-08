@@ -1,6 +1,6 @@
 NAME = sing-box
 COMMIT = $(shell git rev-parse --short HEAD)
-TAGS_GO118 = with_gvisor,with_dhcp,with_reality_server,with_clash_api
+TAGS_GO118 = with_dhcp,with_reality_server,with_clash_api
 TAGS_GO120 = with_quic,with_ech,with_utls
 TAGS ?= $(TAGS_GO118),$(TAGS_GO120)
 TAGS_TEST ?= with_gvisor,with_quic,with_grpc,with_ech,with_utls,with_reality_server
@@ -25,6 +25,7 @@ build-server:
 
 build-server-windows:
 	GOOS=windows GOARCH=amd64 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-win64.exe $(MAIN)
+build-server-windows-32:
 	GOOS=windows GOARCH=386 go build $(MAIN_PARAMS) -o $(MAIN)-$(VERSION)-win32.exe $(MAIN)
 
 build:
