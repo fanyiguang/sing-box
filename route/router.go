@@ -228,13 +228,16 @@ func NewRouter(
 				}
 				_, notIpAddress := netip.ParseAddr(serverAddress)
 				if server.AddressResolver != "" {
-					if !transportTagMap[server.AddressResolver] {
-						return nil, E.New("parse dns server[", tag, "]: address resolver not found: ", server.AddressResolver)
-					}
-					if upstream, exists := dummyTransportMap[server.AddressResolver]; exists {
-						detour = dns.NewDialerWrapper(detour, router.dnsClient, upstream, dns.DomainStrategy(server.AddressStrategy), time.Duration(server.AddressFallbackDelay))
+					if server.AddressResolver == "none" {
 					} else {
-						continue
+						if !transportTagMap[server.AddressResolver] {
+							return nil, E.New("parse dns server[", tag, "]: address resolver not found: ", server.AddressResolver)
+						}
+						if upstream, exists := dummyTransportMap[server.AddressResolver]; exists {
+							detour = dns.NewDialerWrapper(detour, router.dnsClient, upstream, dns.DomainStrategy(server.AddressStrategy), time.Duration(server.AddressFallbackDelay))
+						} else {
+							continue
+						}
 					}
 				} else if notIpAddress != nil && strings.Contains(server.Address, ".") {
 					return nil, E.New("parse dns server[", tag, "]: missing address_resolver")
@@ -1176,13 +1179,16 @@ func (r *Router) AddDNSServer(servers []option.DNSServerOptions) error {
 			}
 			_, notIpAddress := netip.ParseAddr(serverAddress)
 			if server.AddressResolver != "" {
-				if !transportTagMap[server.AddressResolver] {
-					return E.New("parse dns server[", server.Tag, "]: address resolver not found: ", server.AddressResolver)
-				}
-				if upstream, exists := dummyTransportMap[server.AddressResolver]; exists {
-					detour = dns.NewDialerWrapper(detour, r.dnsClient, upstream, dns.DomainStrategy(server.AddressStrategy), time.Duration(server.AddressFallbackDelay))
+				if server.AddressResolver == "none" {
 				} else {
-					continue
+					if !transportTagMap[server.AddressResolver] {
+						return E.New("parse dns server[", server.Tag, "]: address resolver not found: ", server.AddressResolver)
+					}
+					if upstream, exists := dummyTransportMap[server.AddressResolver]; exists {
+						detour = dns.NewDialerWrapper(detour, r.dnsClient, upstream, dns.DomainStrategy(server.AddressStrategy), time.Duration(server.AddressFallbackDelay))
+					} else {
+						continue
+					}
 				}
 			} else if notIpAddress != nil {
 				switch serverURL.Scheme {
