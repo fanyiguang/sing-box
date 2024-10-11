@@ -839,6 +839,9 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 			}
 		}
 	}
+
+	r.searchProcess(ctx, &metadata)
+
 	destination := metadata.Destination
 	if metadata.Destination.IsFqdn() && metadata.DestinationAddresses == nil && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
@@ -978,6 +981,9 @@ func (r *Router) RoutePacketConnection(ctx context.Context, conn N.PacketConn, m
 			}
 		}
 	}
+
+	r.searchProcess(ctx, &metadata)
+
 	destination := metadata.Destination
 	if metadata.Destination.IsFqdn() && metadata.DestinationAddresses == nil && dns.DomainStrategy(metadata.InboundOptions.DomainStrategy) != dns.DomainStrategyAsIS {
 		addresses, err := r.Lookup(adapter.WithContext(ctx, &metadata), metadata.Destination.Fqdn, dns.DomainStrategy(metadata.InboundOptions.DomainStrategy))
@@ -1036,40 +1042,40 @@ func (r *Router) match(ctx context.Context, metadata *adapter.InboundContext, de
 }
 
 func (r *Router) match0(ctx context.Context, metadata *adapter.InboundContext, defaultOutbound adapter.Outbound) (adapter.Rule, adapter.Outbound) {
-	if r.processSearcher != nil {
-		var originDestination netip.AddrPort
-		if metadata.OriginDestination.IsValid() {
-			originDestination = metadata.OriginDestination.AddrPort()
-		} else if metadata.Destination.IsIP() {
-			originDestination = metadata.Destination.AddrPort()
-		}
-		processInfo, err := process.FindProcessInfo(r.processSearcher, ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
-		if err != nil {
-			r.logger.InfoContext(ctx, "failed to search process: ", err)
-		} else {
-			if processInfo.ProcessPath != "" {
-				r.logger.InfoContext(ctx, "found process path: ", processInfo.ProcessPath)
-				if processInfo.PID != 0 {
-					r.logger.InfoContext(ctx, "found process PID: ", processInfo.PID)
-				}
-			} else if processInfo.PackageName != "" {
-				r.logger.InfoContext(ctx, "found package name: ", processInfo.PackageName)
-			} else if processInfo.UserId != -1 {
-				if /*needUserName &&*/ true {
-					osUser, _ := user.LookupId(F.ToString(processInfo.UserId))
-					if osUser != nil {
-						processInfo.User = osUser.Username
-					}
-				}
-				if processInfo.User != "" {
-					r.logger.InfoContext(ctx, "found user: ", processInfo.User)
-				} else {
-					r.logger.InfoContext(ctx, "found user id: ", processInfo.UserId)
-				}
-			}
-			metadata.ProcessInfo = processInfo
-		}
-	}
+	//if r.processSearcher != nil {
+	//	var originDestination netip.AddrPort
+	//	if metadata.OriginDestination.IsValid() {
+	//		originDestination = metadata.OriginDestination.AddrPort()
+	//	} else if metadata.Destination.IsIP() {
+	//		originDestination = metadata.Destination.AddrPort()
+	//	}
+	//	processInfo, err := process.FindProcessInfo(r.processSearcher, ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
+	//	if err != nil {
+	//		r.logger.InfoContext(ctx, "failed to search process: ", err)
+	//	} else {
+	//		if processInfo.ProcessPath != "" {
+	//			r.logger.InfoContext(ctx, "found process path: ", processInfo.ProcessPath)
+	//			if processInfo.PID != 0 {
+	//				r.logger.InfoContext(ctx, "found process PID: ", processInfo.PID)
+	//			}
+	//		} else if processInfo.PackageName != "" {
+	//			r.logger.InfoContext(ctx, "found package name: ", processInfo.PackageName)
+	//		} else if processInfo.UserId != -1 {
+	//			if /*needUserName &&*/ true {
+	//				osUser, _ := user.LookupId(F.ToString(processInfo.UserId))
+	//				if osUser != nil {
+	//					processInfo.User = osUser.Username
+	//				}
+	//			}
+	//			if processInfo.User != "" {
+	//				r.logger.InfoContext(ctx, "found user: ", processInfo.User)
+	//			} else {
+	//				r.logger.InfoContext(ctx, "found user id: ", processInfo.UserId)
+	//			}
+	//		}
+	//		metadata.ProcessInfo = processInfo
+	//	}
+	//}
 	for i, rule := range r.rules {
 		metadata.ResetRuleCache()
 		if rule.Match(metadata) {
@@ -1480,4 +1486,41 @@ func (r *Router) DelRules(tag string) {
 		}
 		return true
 	})
+}
+
+func (r *Router) searchProcess(ctx context.Context, metadata *adapter.InboundContext) {
+	if r.processSearcher != nil {
+		var originDestination netip.AddrPort
+		if metadata.OriginDestination.IsValid() {
+			originDestination = metadata.OriginDestination.AddrPort()
+		} else if metadata.Destination.IsIP() {
+			originDestination = metadata.Destination.AddrPort()
+		}
+		processInfo, err := process.FindProcessInfo(r.processSearcher, ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
+		if err != nil {
+			r.logger.InfoContext(ctx, "failed to search process: ", err)
+		} else {
+			if processInfo.ProcessPath != "" {
+				r.logger.InfoContext(ctx, "found process path: ", processInfo.ProcessPath)
+				if processInfo.PID != 0 {
+					r.logger.InfoContext(ctx, "found process PID: ", processInfo.PID)
+				}
+			} else if processInfo.PackageName != "" {
+				r.logger.InfoContext(ctx, "found package name: ", processInfo.PackageName)
+			} else if processInfo.UserId != -1 {
+				if /*needUserName &&*/ true {
+					osUser, _ := user.LookupId(F.ToString(processInfo.UserId))
+					if osUser != nil {
+						processInfo.User = osUser.Username
+					}
+				}
+				if processInfo.User != "" {
+					r.logger.InfoContext(ctx, "found user: ", processInfo.User)
+				} else {
+					r.logger.InfoContext(ctx, "found user id: ", processInfo.UserId)
+				}
+			}
+			metadata.ProcessInfo = processInfo
+		}
+	}
 }
