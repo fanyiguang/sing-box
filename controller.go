@@ -2,6 +2,7 @@ package box
 
 import (
 	"github.com/sagernet/sing-box/adapter"
+	"github.com/sagernet/sing-box/experimental/clashapi/trafficontrol"
 	"github.com/sagernet/sing-box/inbound"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing-box/outbound"
@@ -105,4 +106,12 @@ func (s *Box) AddDNSServer(servers []option.DNSServerOptions) error {
 
 func (s *Box) DelDNSServer(tag string) bool {
 	return s.router.DelDNSServer(tag)
+}
+
+func (s *Box) CloseAllConnections() error {
+	trafficManager := trafficontrol.NewManager()
+	for _, c := range trafficManager.Snapshot().Connections {
+		c.Close()
+	}
+	return s.router.ResetNetwork()
 }

@@ -25,8 +25,7 @@ github.com/dop251/goja v0.0.0-20210427212725-462d53687b0d/go.mod h1:R9ET47fwRVRP
 github.com/dop251/goja_nodejs v0.0.0-20210225215109-d91c329300e7/go.mod h1:hn7BA7c8pLvoGndExHudxTDKZ84Pyvv+90pbBjbTz0Y=
 github.com/fanyiguang/go-ieproxy v0.0.0-20231120070622-b1a78033a014 h1:QNa9SriCoUwK9RA39jCy3GRVKpS3ivP6mR2yA4iKtCg=
 github.com/fanyiguang/go-ieproxy v0.0.0-20231120070622-b1a78033a014/go.mod h1:/NsJd+kxZBmjMc5hrJCKMbP57B84rvq9BiDRbtO9AS0=
-github.com/fanyiguang/sing v0.2.5-0.20240830120205-15914aae91d8/go.mod h1:9pfuAH6mZfgnz/YjP6xu5sxx882rfyjpcrTdUpd6w3g=
-github.com/fanyiguang/sing v0.2.5-0.20240910053819-cfc1e19fea43/go.mod h1:9pfuAH6mZfgnz/YjP6xu5sxx882rfyjpcrTdUpd6w3g=
+github.com/fanyiguang/sing v0.2.5-0.20240911030018-c447ef6045a3 h1:OznsH5c1mh1b9FLLoTVZ32otARn3+nd2iXoxP42qXSA=
 github.com/fanyiguang/sing v0.2.5-0.20240911030018-c447ef6045a3/go.mod h1:9pfuAH6mZfgnz/YjP6xu5sxx882rfyjpcrTdUpd6w3g=
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119 h1:MZ7jRmpDgMzZJYllaWowrSUaZ0bIqzXrDjn6BsJdyEk=
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119/go.mod h1:j2YZBIpWIuElPFL/5sJAj470bcn/3QQ5lxZUNKLDNAM=
