@@ -11,6 +11,8 @@ import (
 )
 
 func (s *Box) AddInbound(inboundOption option.Inbound, replace bool) error {
+	s.mt.Lock()
+	defer s.mt.Unlock()
 	var tag string
 	if inboundOption.Tag != "" {
 		tag = inboundOption.Tag
@@ -28,14 +30,30 @@ func (s *Box) AddInbound(inboundOption option.Inbound, replace bool) error {
 		s.logger.Warn("parse inbound error: ", err)
 		return err
 	}
-	return s.router.AddInbound(in, replace)
+	err = s.router.AddInbound(in, replace)
+	if err != nil {
+		s.logger.Warn("add inbound error: ", err)
+		return err
+	}
+	s.inbounds = append(s.inbounds, in)
+	return nil
 }
 
 func (s *Box) DelInbound(tag string) {
+	s.mt.Lock()
+	defer s.mt.Unlock()
 	s.router.DelInbound(tag)
+	for i, inb := range s.inbounds {
+		if inb.Tag() == tag {
+			s.inbounds = append(s.inbounds[:i], s.inbounds[i+1:]...)
+			break
+		}
+	}
 }
 
 func (s *Box) AddOutbounds(outboundOptions []option.Outbound, replace bool) error {
+	s.mt.Lock()
+	defer s.mt.Unlock()
 	var outbounds []adapter.Outbound
 	for i, outboundOption := range outboundOptions {
 		var tag string
@@ -56,7 +74,13 @@ func (s *Box) AddOutbounds(outboundOptions []option.Outbound, replace bool) erro
 		}
 		outbounds = append(outbounds, out)
 	}
-	return s.router.AddOutbounds(outbounds, replace)
+	err := s.router.AddOutbounds(outbounds, replace)
+	if err != nil {
+		s.logger.Warn("add outbound error: ", err)
+		return err
+	}
+	s.outbounds = append(s.outbounds, outbounds...)
+	return nil
 }
 
 func (s *Box) Outbound(name string) (adapter.Outbound, bool) {
@@ -64,7 +88,15 @@ func (s *Box) Outbound(name string) (adapter.Outbound, bool) {
 }
 
 func (s *Box) DelOutbound(name string) {
+	s.mt.Lock()
+	defer s.mt.Unlock()
 	s.router.DelOutbound(name)
+	for i, out := range s.outbounds {
+		if out.Tag() == name {
+			s.outbounds = append(s.outbounds[:i], s.outbounds[i+1:]...)
+			break
+		}
+	}
 }
 
 func (s *Box) AddRules(ruleOptions []option.Rule) error {

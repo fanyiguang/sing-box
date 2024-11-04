@@ -104,6 +104,7 @@ type Tracker interface {
 type OutboundGroup interface {
 	Outbound
 	Now() string
+	NowOutbound() Outbound
 	All() []string
 }
 

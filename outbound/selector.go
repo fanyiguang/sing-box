@@ -100,6 +100,10 @@ func (s *Selector) Now() string {
 	return s.selected.Tag()
 }
 
+func (s *Selector) NowOutbound() adapter.Outbound {
+	return s.selected
+}
+
 func (s *Selector) All() []string {
 	return s.tags
 }

@@ -111,6 +111,15 @@ func (s *URLTest) Now() string {
 	return ""
 }
 
+func (s *URLTest) NowOutbound() adapter.Outbound {
+	if s.group.selectedOutboundTCP != nil {
+		return s.group.selectedOutboundTCP
+	} else if s.group.selectedOutboundUDP != nil {
+		return s.group.selectedOutboundUDP
+	}
+	return nil
+}
+
 func (s *URLTest) All() []string {
 	return s.tags
 }

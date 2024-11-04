@@ -84,6 +84,10 @@ func (d *DynamicURLTest) Now() string {
 	return d.group.Select(N.NetworkTCP).Tag()
 }
 
+func (d *DynamicURLTest) NowOutbound() adapter.Outbound {
+	return d.group.Select(N.NetworkTCP)
+}
+
 func (d *DynamicURLTest) All() []string {
 	return d.tags
 }

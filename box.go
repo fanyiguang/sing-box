@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"runtime/debug"
+	"sync"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -29,6 +30,7 @@ import (
 var _ adapter.Service = (*Box)(nil)
 
 type Box struct {
+	mt           sync.Mutex
 	createdAt    time.Time
 	router       adapter.Router
 	inbounds     []adapter.Inbound
