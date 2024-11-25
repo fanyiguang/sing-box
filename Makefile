@@ -1,9 +1,9 @@
 NAME = sing-box
 COMMIT = $(shell git rev-parse --short HEAD)
-TAGS_GO118 = with_gvisor,with_dhcp,with_reality_server,with_clash_api
+TAGS_GO118 = with_dhcp,with_reality_server,with_clash_api
 TAGS_GO120 = with_quic,with_ech,with_utls
 TAGS ?= $(TAGS_GO118),$(TAGS_GO120)
-TAGS_TEST ?= with_gvisor,with_quic,with_grpc,with_ech,with_utls,with_reality_server
+TAGS_TEST ?= with_quic,with_grpc,with_ech,with_utls,with_reality_server
 
 GOHOSTOS = $(shell go env GOHOSTOS)
 GOHOSTARCH = $(shell go env GOHOSTARCH)
@@ -63,6 +63,9 @@ proto:
 proto_install:
 	go install -v google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install -v google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+proto_addons:
+	protoc ./transport/vless/client_addons.proto --go_out=./ --go_opt=paths=source_relative
 
 release:
 	go run ./cmd/internal/build goreleaser release --clean --skip-publish || exit 1
