@@ -124,6 +124,8 @@ func NewServer(ctx context.Context, router adapter.Router, logFactory log.Observ
 				fs.ServeHTTP(w, r)
 			})
 		})
+	} else {
+		chiRouter.Group(UICallBack(server.logger))
 	}
 	return server, nil
 }
