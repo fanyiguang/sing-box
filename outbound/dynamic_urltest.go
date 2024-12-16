@@ -2,6 +2,7 @@ package outbound
 
 import (
 	"context"
+	"github.com/fanyiguang/brick/channel"
 	"net"
 	"sort"
 	"sync"
@@ -202,17 +203,19 @@ func (d *DynamicURLTestGroup) startURLTest(t int) {
 		d.logger.Info("testingStopTimer reset: ", t, "s")
 	default:
 		d.logger.Info("start loop check")
-		close(d.testingStarted)
+		channel.Close(d.testingStarted)
 		go d.loopCheck(t)
 	}
 }
 
 func (d *DynamicURLTestGroup) Close() error {
+	d.mt.Lock()
+	defer d.mt.Unlock()
 	d.urlTestTicker.Stop()
 	if d.testingStopTimer != nil {
 		d.testingStopTimer.Stop()
 	}
-	close(d.stop)
+	channel.Close(d.stop)
 	return nil
 }
 

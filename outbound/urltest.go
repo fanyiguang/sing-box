@@ -2,6 +2,7 @@ package outbound
 
 import (
 	"context"
+	"github.com/fanyiguang/brick/channel"
 	"net"
 	"sync"
 	"time"
@@ -276,7 +277,7 @@ func (g *URLTestGroup) Close() error {
 		return nil
 	}
 	g.ticker.Stop()
-	close(g.close)
+	channel.Close(g.close)
 	return nil
 }
 
