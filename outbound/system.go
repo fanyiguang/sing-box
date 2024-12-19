@@ -541,6 +541,9 @@ func (s *System) createOutbound(proxyURL string) (adapter.Outbound, error) {
 	if err != nil {
 		return nil, err
 	}
+	if URLParse.Hostname() == "localhost" {
+		URLParse.Host = net.JoinHostPort("127.0.0.1", URLParse.Port())
+	}
 	outOption, err := parser.GetOutboundFromURL(URLParse, 1, "")
 	if err != nil {
 		return nil, err
