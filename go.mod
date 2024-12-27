@@ -1,7 +1,7 @@
 module github.com/sagernet/sing-box
 
 replace (
-	github.com/sagernet/sing => github.com/fanyiguang/sing v0.2.5-0.20240131100118-512262fb7393
+	github.com/sagernet/sing => /Users/fanyiguan/golang/obj/zixun/sing
 	github.com/sagernet/sing-shadowsocks v0.2.6 => github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119
 	github.com/sagernet/sing-shadowsocks2 v0.2.0 => github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac
 )
@@ -66,6 +66,7 @@ require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/fanyiguang/brick v0.0.0-20241226023402-689b2031c0e7 // indirect
 	github.com/gaukas/godicttls v0.0.4 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect

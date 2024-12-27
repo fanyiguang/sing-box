@@ -210,7 +210,7 @@ func CopyEarlyConn(ctx context.Context, conn net.Conn, serverConn net.Conn) erro
 				serverConn.Close()
 				return err
 			}
-			return bufio.CopyConn(ctx, conn, serverConn)
+			return bufio.CopyConnEx(ctx, conn, serverConn)
 		}
 	}
 	if earlyConn, isEarlyConn := common.Cast[N.EarlyConn](serverConn); isEarlyConn && earlyConn.NeedHandshake() {
@@ -242,7 +242,7 @@ func CopyEarlyConn(ctx context.Context, conn net.Conn, serverConn net.Conn) erro
 			return N.ReportHandshakeFailure(conn, err)
 		}
 	}
-	return bufio.CopyConn(ctx, conn, serverConn)
+	return bufio.CopyConnEx(ctx, conn, serverConn)
 }
 
 func NewError(logger log.ContextLogger, ctx context.Context, err error) {
