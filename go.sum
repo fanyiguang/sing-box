@@ -33,6 +33,8 @@ github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119 h1:MZ7
 github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119/go.mod h1:j2YZBIpWIuElPFL/5sJAj470bcn/3QQ5lxZUNKLDNAM=
 github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac h1:PEW5UkXvd96kJ8UAxnHk9PZ9sGgii1a01h5mirH+g0w=
 github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac/go.mod h1:RnXS0lExcDAovvDeniJ4IKa2IuChrdipolPYWBv9hWQ=
+github.com/fanyiguang/utls v1.5.5-0.20250106060502-2a3a0a4a2844 h1:8o1cEQ3RVpQ4f4jwIb5p50D9iWjHIfU8PHHttJ+mbRo=
+github.com/fanyiguang/utls v1.5.5-0.20250106060502-2a3a0a4a2844/go.mod h1:CTGxPWExIloRipK3XFpYv0OVyhO8kk3XCGW/ieyTh1s=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
 github.com/gaukas/godicttls v0.0.4 h1:NlRaXb3J6hAnTmWdsEKb9bcSBD6BvcIjdGdeb0zfXbk=
@@ -148,8 +150,6 @@ github.com/sagernet/smux v0.0.0-20231208180855-7041f6ea79e7 h1:DImB4lELfQhplLTxe
 github.com/sagernet/smux v0.0.0-20231208180855-7041f6ea79e7/go.mod h1:FP9X2xjT/Az1EsG/orYYoC+5MojWnuI7hrffz8fGwwo=
 github.com/sagernet/tfo-go v0.0.0-20231209031829-7b5343ac1dc6 h1:z3SJQhVyU63FT26Wn/UByW6b7q8QKB0ZkPqsyqcz2PI=
 github.com/sagernet/tfo-go v0.0.0-20231209031829-7b5343ac1dc6/go.mod h1:73xRZuxwkFk4aiLw28hG8W6o9cr2UPrGL9pdY2UTbvY=
-github.com/sagernet/utls v1.5.4 h1:KmsEGbB2dKUtCNC+44NwAdNAqnqQ6GA4pTO0Yik56co=
-github.com/sagernet/utls v1.5.4/go.mod h1:CTGxPWExIloRipK3XFpYv0OVyhO8kk3XCGW/ieyTh1s=
 github.com/sagernet/wireguard-go v0.0.0-20231215174105-89dec3b2f3e8 h1:R0OMYAScomNAVpTfbHFpxqJpvwuhxSRi+g6z7gZhABs=
 github.com/sagernet/wireguard-go v0.0.0-20231215174105-89dec3b2f3e8/go.mod h1:K4J7/npM+VAMUeUmTa2JaA02JmyheP0GpRBOUvn3ecc=
 github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854 h1:6uUiZcDRnZSAegryaUGwPC/Fj13JSHwiTftrXhMmYOc=

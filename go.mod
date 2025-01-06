@@ -7,6 +7,7 @@ replace (
 	github.com/sagernet/sing-shadowsocks v0.2.6 => github.com/fanyiguang/sing-shadowsocks v0.0.0-20240201085418-a2ff46dbc119
 	github.com/sagernet/sing-shadowsocks2 v0.2.0 => github.com/fanyiguang/sing-shadowsocks2 v0.2.1-0.20240319095538-2633709b1dac
 	github.com/sagernet/sing-tun => github.com/sagernet/sing-tun v0.1.16
+	github.com/sagernet/utls v1.5.4 => github.com/fanyiguang/utls v1.5.5-0.20250106060502-2a3a0a4a2844
 )
 
 go 1.20
