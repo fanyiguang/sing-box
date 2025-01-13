@@ -1,4 +1,4 @@
-package dns
+package crypto
 
 import (
 	"crypto/aes"
