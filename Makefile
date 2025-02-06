@@ -64,6 +64,9 @@ proto_install:
 	go install -v google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install -v google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
+proto_addons:
+	protoc ./transport/vless/client_addons.proto --go_out=./ --go_opt=paths=source_relative
+
 release:
 	go run ./cmd/internal/build goreleaser release --clean --skip-publish || exit 1
 	mkdir dist/release

@@ -265,3 +265,10 @@ func (o *ServerOptions) TakeServerOptions() ServerOptions {
 func (o *ServerOptions) ReplaceServerOptions(options ServerOptions) {
 	*o = options
 }
+
+type TraceOptions struct {
+	Trace struct {
+		Enable bool `json:"enable"`
+		//Type   string `json:"type"`
+	} `json:"trace,omitempty"`
+}

@@ -35,6 +35,7 @@ type myOutboundAdapter struct {
 	tag            string
 	dependencies   []string
 	outboundServer M.Socksaddr
+	trace          bool
 }
 
 func (a *myOutboundAdapter) Type() string {

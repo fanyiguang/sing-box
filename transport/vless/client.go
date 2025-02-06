@@ -22,9 +22,11 @@ type Client struct {
 	key    [16]byte
 	flow   string
 	logger logger.Logger
+	trace  bool
+	token  string
 }
 
-func NewClient(userId string, flow string, logger logger.Logger) (*Client, error) {
+func NewClient(userId string, flow string, logger logger.Logger, trace bool, token string) (*Client, error) {
 	user := uuid.FromStringOrNil(userId)
 	if user == uuid.Nil {
 		user = uuid.NewV5(user, userId)
@@ -34,7 +36,7 @@ func NewClient(userId string, flow string, logger logger.Logger) (*Client, error
 	default:
 		return nil, E.New("unsupported flow: " + flow)
 	}
-	return &Client{user, flow, logger}, nil
+	return &Client{user, flow, logger, trace, token}, nil
 }
 
 func (c *Client) prepareConn(conn net.Conn, tlsConn net.Conn) (net.Conn, error) {
@@ -48,8 +50,8 @@ func (c *Client) prepareConn(conn net.Conn, tlsConn net.Conn) (net.Conn, error) 
 	return conn, nil
 }
 
-func (c *Client) DialConn(conn net.Conn, destination M.Socksaddr) (net.Conn, error) {
-	remoteConn := NewConn(conn, c.key, vmess.CommandTCP, destination, c.flow)
+func (c *Client) DialConn(conn net.Conn, destination M.Socksaddr, traceId string) (net.Conn, error) {
+	remoteConn := NewConn(conn, c.key, vmess.CommandTCP, destination, c.flow, c.token, traceId)
 	protocolConn, err := c.prepareConn(remoteConn, conn)
 	if err != nil {
 		return nil, err
@@ -57,21 +59,21 @@ func (c *Client) DialConn(conn net.Conn, destination M.Socksaddr) (net.Conn, err
 	return protocolConn, common.Error(remoteConn.Write(nil))
 }
 
-func (c *Client) DialEarlyConn(conn net.Conn, destination M.Socksaddr) (net.Conn, error) {
-	return c.prepareConn(NewConn(conn, c.key, vmess.CommandTCP, destination, c.flow), conn)
+func (c *Client) DialEarlyConn(conn net.Conn, destination M.Socksaddr, traceId string) (net.Conn, error) {
+	return c.prepareConn(NewConn(conn, c.key, vmess.CommandTCP, destination, c.flow, c.token, traceId), conn)
 }
 
-func (c *Client) DialPacketConn(conn net.Conn, destination M.Socksaddr) (*PacketConn, error) {
-	serverConn := &PacketConn{Conn: conn, key: c.key, destination: destination, flow: c.flow}
+func (c *Client) DialPacketConn(conn net.Conn, destination M.Socksaddr, traceId string) (*PacketConn, error) {
+	serverConn := &PacketConn{Conn: conn, key: c.key, destination: destination, flow: c.flow, token: c.token, traceId: traceId}
 	return serverConn, common.Error(serverConn.Write(nil))
 }
 
-func (c *Client) DialEarlyPacketConn(conn net.Conn, destination M.Socksaddr) (*PacketConn, error) {
-	return &PacketConn{Conn: conn, key: c.key, destination: destination, flow: c.flow}, nil
+func (c *Client) DialEarlyPacketConn(conn net.Conn, destination M.Socksaddr, traceId string) (*PacketConn, error) {
+	return &PacketConn{Conn: conn, key: c.key, destination: destination, flow: c.flow, token: c.token, traceId: traceId}, nil
 }
 
-func (c *Client) DialXUDPPacketConn(conn net.Conn, destination M.Socksaddr) (vmess.PacketConn, error) {
-	remoteConn := NewConn(conn, c.key, vmess.CommandTCP, destination, c.flow)
+func (c *Client) DialXUDPPacketConn(conn net.Conn, destination M.Socksaddr, traceId string) (vmess.PacketConn, error) {
+	remoteConn := NewConn(conn, c.key, vmess.CommandTCP, destination, c.flow, c.token, traceId)
 	protocolConn, err := c.prepareConn(remoteConn, conn)
 	if err != nil {
 		return nil, err
@@ -79,8 +81,8 @@ func (c *Client) DialXUDPPacketConn(conn net.Conn, destination M.Socksaddr) (vme
 	return vmess.NewXUDPConn(protocolConn, destination), common.Error(remoteConn.Write(nil))
 }
 
-func (c *Client) DialEarlyXUDPPacketConn(conn net.Conn, destination M.Socksaddr) (vmess.PacketConn, error) {
-	remoteConn := NewConn(conn, c.key, vmess.CommandMux, destination, c.flow)
+func (c *Client) DialEarlyXUDPPacketConn(conn net.Conn, destination M.Socksaddr, traceId string) (vmess.PacketConn, error) {
+	remoteConn := NewConn(conn, c.key, vmess.CommandMux, destination, c.flow, c.token, traceId)
 	protocolConn, err := c.prepareConn(remoteConn, conn)
 	if err != nil {
 		return nil, err
@@ -101,7 +103,7 @@ type Conn struct {
 	responseRead   bool
 }
 
-func NewConn(conn net.Conn, uuid [16]byte, command byte, destination M.Socksaddr, flow string) *Conn {
+func NewConn(conn net.Conn, uuid [16]byte, command byte, destination M.Socksaddr, flow, token, traceId string) *Conn {
 	return &Conn{
 		ExtendedConn: bufio.NewExtendedConn(conn),
 		writer:       bufio.NewVectorisedWriter(conn),
@@ -110,6 +112,8 @@ func NewConn(conn net.Conn, uuid [16]byte, command byte, destination M.Socksaddr
 			Command:     command,
 			Destination: destination,
 			Flow:        flow,
+			Token:       token,
+			TraceId:     traceId,
 		},
 	}
 }
@@ -204,6 +208,8 @@ type PacketConn struct {
 	flow           string
 	requestWritten bool
 	responseRead   bool
+	traceId        string
+	token          string
 }
 
 func (c *PacketConn) Read(b []byte) (n int, err error) {
@@ -231,7 +237,7 @@ func (c *PacketConn) Write(b []byte) (n int, err error) {
 		if c.requestWritten {
 			c.access.Unlock()
 		} else {
-			err = WritePacketRequest(c.Conn, Request{c.key, vmess.CommandUDP, c.destination, c.flow}, nil)
+			err = WritePacketRequest(c.Conn, Request{c.key, vmess.CommandUDP, c.destination, c.flow, c.token, c.traceId}, nil)
 			if err == nil {
 				n = len(b)
 			}
@@ -255,7 +261,7 @@ func (c *PacketConn) WritePacket(buffer *buf.Buffer, destination M.Socksaddr) er
 		if c.requestWritten {
 			c.access.Unlock()
 		} else {
-			err := WritePacketRequest(c.Conn, Request{c.key, vmess.CommandUDP, c.destination, c.flow}, buffer.Bytes())
+			err := WritePacketRequest(c.Conn, Request{c.key, vmess.CommandUDP, c.destination, c.flow, c.token, c.traceId}, buffer.Bytes())
 			c.requestWritten = true
 			c.access.Unlock()
 			return err

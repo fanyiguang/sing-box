@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package transport.vless;
+option go_package = "github.com/sagernet/sing-box/transport/vless";
+
+message ClientAddons {
+  string Flow = 1;
+  bytes Seed = 2;
+  string TraceId = 3;
+  string Token = 6;
+}
