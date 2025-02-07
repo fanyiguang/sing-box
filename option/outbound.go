@@ -76,6 +76,10 @@ func (h *Outbound) RawOptions() (any, error) {
 		rawOptionsPtr = &h.URLTestOptions
 	case C.TypeDynamicURLTest:
 		rawOptionsPtr = &h.DynamicURLTestOptions
+	case "zless":
+		rawOptionsPtr = &h.VLESSOptions
+	case "cdnwss":
+		rawOptionsPtr = &h.VLESSOptions
 	case "":
 		return nil, E.New("missing outbound type")
 	default:
@@ -113,6 +117,8 @@ func (h *Outbound) SetDetour(detour string) {
 		h.ShadowsocksROptions.Detour = detour
 	case C.TypeVLESS:
 		h.VLESSOptions.Detour = detour
+	case "zless", "cdnwss":
+		h.VLESSOptions.Detour = detour
 	case C.TypeSelector:
 	case C.TypeURLTest:
 	case C.TypeDynamicURLTest:
@@ -147,9 +153,23 @@ func (h *Outbound) ReplaceServer(server string, serverPort uint16) {
 		h.ShadowsocksROptions.Server, h.ShadowsocksROptions.ServerPort = server, serverPort
 	case C.TypeVLESS:
 		h.VLESSOptions.Server, h.VLESSOptions.ServerPort = server, serverPort
+	case "zless":
+		h.VLESSOptions.Server, h.VLESSOptions.ServerPort = server, serverPort
+	case "cdnwss":
+		h.VLESSOptions.Server, h.VLESSOptions.ServerPort = server, serverPort
 	case C.TypeSelector:
 	case C.TypeURLTest:
 	case C.TypeDynamicURLTest:
+	default:
+	}
+}
+
+func (h *Outbound) EnableTLS(serverName string, insecure bool) {
+	switch h.Type {
+	case "zless":
+		h.VLESSOptions.TLS.Enabled = true
+		h.VLESSOptions.TLS.Insecure = insecure
+		h.VLESSOptions.TLS.ServerName = serverName
 	default:
 	}
 }
