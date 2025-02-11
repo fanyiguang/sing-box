@@ -1,6 +1,7 @@
 package route
 
 import (
+	"runtime"
 	"strings"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -19,6 +20,9 @@ func NewProcessPathItem(processNameList []string) *ProcessPathItem {
 		processMap: make(map[string]bool),
 	}
 	for _, processName := range processNameList {
+		if runtime.GOOS == "windows" {
+			processName = strings.ToLower(processName)
+		}
 		rule.processMap[processName] = true
 	}
 	return rule
@@ -28,7 +32,11 @@ func (r *ProcessPathItem) Match(metadata *adapter.InboundContext) bool {
 	if metadata.ProcessInfo == nil || metadata.ProcessInfo.ProcessPath == "" {
 		return false
 	}
-	return r.processMap[metadata.ProcessInfo.ProcessPath]
+	processName := metadata.ProcessInfo.ProcessPath
+	if runtime.GOOS == "windows" {
+		processName = strings.ToLower(metadata.ProcessInfo.ProcessPath)
+	}
+	return r.processMap[processName]
 }
 
 func (r *ProcessPathItem) String() string {
