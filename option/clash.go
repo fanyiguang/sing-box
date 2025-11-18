@@ -27,3 +27,7 @@ type DynamicURLTestOutboundOptions struct {
 	Interval  Duration `json:"interval,omitempty"`
 	Tolerance uint16   `json:"tolerance,omitempty"`
 }
+
+type AutoSelectorOutboundOptions struct {
+	Outbounds []string `json:"outbounds"`
+}

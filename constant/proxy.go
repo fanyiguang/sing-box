@@ -28,4 +28,5 @@ const (
 	TypeSelector       = "selector"
 	TypeURLTest        = "urltest"
 	TypeDynamicURLTest = "dynamicurltest"
+	TypeAutoSelector   = "autoselector"
 )

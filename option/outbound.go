@@ -27,6 +27,7 @@ type _Outbound struct {
 	SelectorOptions       SelectorOutboundOptions       `json:"-"`
 	URLTestOptions        URLTestOutboundOptions        `json:"-"`
 	DynamicURLTestOptions DynamicURLTestOutboundOptions `json:"-"`
+	AutoSelectorOptions   AutoSelectorOutboundOptions   `json:"-"`
 }
 
 type Outbound _Outbound
@@ -70,6 +71,8 @@ func (h Outbound) MarshalJSON() ([]byte, error) {
 		v = h.URLTestOptions
 	case C.TypeDynamicURLTest:
 		v = h.DynamicURLTestOptions
+	case C.TypeAutoSelector:
+		v = h.AutoSelectorOptions
 	default:
 		return nil, E.New("unknown outbound type: ", h.Type)
 	}
@@ -119,6 +122,8 @@ func (h *Outbound) UnmarshalJSON(bytes []byte) error {
 		v = &h.URLTestOptions
 	case C.TypeDynamicURLTest:
 		v = &h.DynamicURLTestOptions
+	case C.TypeAutoSelector:
+		v = &h.AutoSelectorOptions
 	default:
 		return E.New("unknown outbound type: ", h.Type)
 	}
@@ -161,6 +166,7 @@ func (h *Outbound) SetDetour(detour string) {
 	case C.TypeSelector:
 	case C.TypeURLTest:
 	case C.TypeDynamicURLTest:
+	case C.TypeAutoSelector:
 	default:
 	}
 }
@@ -195,6 +201,7 @@ func (h *Outbound) ReplaceServer(server string, serverPort uint16) {
 	case C.TypeSelector:
 	case C.TypeURLTest:
 	case C.TypeDynamicURLTest:
+	case C.TypeAutoSelector:
 	default:
 	}
 }
@@ -229,6 +236,7 @@ func (h *Outbound) TargetInfo() (scheme, host string, port uint16) {
 	case C.TypeSelector:
 	case C.TypeURLTest:
 	case C.TypeDynamicURLTest:
+	case C.TypeAutoSelector:
 	default:
 	}
 	return
