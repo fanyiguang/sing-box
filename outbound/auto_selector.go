@@ -91,6 +91,7 @@ func (d *AutoSelector) DialContext(ctx context.Context, network string, destinat
 	}
 	conn, err := outbound.DialContext(ctx, network, destination)
 	if err == nil {
+		d.logger.InfoContext(ctx, "selected outbound: ", outbound.Tag())
 		return conn, nil
 	}
 	d.logger.ErrorContext(ctx, err)

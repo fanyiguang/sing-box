@@ -2,8 +2,9 @@ package outbound
 
 import (
 	"context"
-	"github.com/sagernet/sing-box/common/tls"
 	"net"
+
+	"github.com/sagernet/sing-box/common/tls"
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/dialer"
